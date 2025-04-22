@@ -12,7 +12,7 @@ import { styled, useColorScheme, useTheme } from '@mui/material/styles'
 
 // Component Imports
 import VerticalNav, { NavHeader, NavCollapseIcons } from '@menu/vertical-menu'
-import VerticalMenu from './VerticalMenu'
+import CustomVerticalMenu from './CustomMenu'
 import Logo from '@components/layout/shared/Logo'
 
 // Hook Imports
@@ -115,7 +115,8 @@ const Navigation = props => {
         )}
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
-      <VerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} />
+      {/* <VerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} /> */}
+      <CustomVerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} />
     </VerticalNav>
   )
 }

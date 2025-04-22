@@ -200,7 +200,7 @@ const UserListTable = ({ tableData }) => {
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
             <IconButton>
-              <Link href={getLocalizedUrl('/apps/user/view', locale)} className='flex'>
+              <Link href={getLocalizedUrl('/user/view', locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -299,14 +299,15 @@ const UserListTable = ({ tableData }) => {
             >
               Export
             </Button>
-            <Button
-              variant='contained'
-              startIcon={<i className='tabler-plus' />}
-              onClick={() => setAddUserOpen(!addUserOpen)}
-              className='max-sm:is-full'
-            >
-              Add New User
-            </Button>
+            <Link href={getLocalizedUrl('/user/add', locale)}>
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-plus' />}
+                className='max-sm:is-full'
+              >
+                Add New User
+              </Button>
+            </Link>
           </div>
         </div>
         <div className='overflow-x-auto'>
