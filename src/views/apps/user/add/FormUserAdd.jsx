@@ -21,6 +21,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
 
 const FormUserAdd = () => {
   // States
@@ -230,6 +231,98 @@ const FormUserAdd = () => {
                 placeholderText='YYYY/MM/DD'
                 customInput={<CustomTextField fullWidth label='Date of Joining' placeholder='YYYY/MM/DD' />}
               />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl>
+                <FormLabel>Gender</FormLabel>
+                <RadioGroup row defaultValue='m' aria-label='gender' name='gender'>
+                  <FormControlLabel value='m' control={<Radio />} label='Male' />
+                  <FormControlLabel value='f' control={<Radio />} label='Female' />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='PF No.'
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Father Name'
+                value={formData.firstName}
+                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='1st Class Duty Pass No.'
+                value={formData.firstName}
+                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                select
+                fullWidth
+                label='Branch'
+                value={formData.country}
+                onChange={e => setFormData({ ...formData, country: e.target.value })}
+              >
+                <MenuItem value=''>No Data</MenuItem>
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                select
+                fullWidth
+                label='Division'
+                value={formData.language}
+                slotProps={{
+                  select: {
+                    multiple: true,
+                    onChange: e => setFormData({ ...formData, language: e.target.value })
+                  }
+                }}
+              >
+                <MenuItem value=''>No Data</MenuItem>
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                select
+                fullWidth
+                label='Designation'
+                value={formData.language}
+                slotProps={{
+                  select: {
+                    multiple: true,
+                    onChange: e => setFormData({ ...formData, language: e.target.value })
+                  }
+                }}
+              >
+                <MenuItem value=''>No Data</MenuItem>
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                select
+                fullWidth
+                label='Choose Station Head Quarter'
+                value={formData.language}
+                slotProps={{
+                  select: {
+                    multiple: true,
+                    onChange: e => setFormData({ ...formData, language: e.target.value })
+                  }
+                }}
+              >
+                <MenuItem value=''>No Data</MenuItem>
+              </CustomTextField>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
