@@ -79,6 +79,7 @@ const FormUserAdd = () => {
                 fullWidth
                 label='Username'
                 placeholder='johnDoe'
+                required={true}
                 value={formData.username}
                 onChange={e => setFormData({ ...formData, username: e.target.value })}
               />
@@ -88,6 +89,7 @@ const FormUserAdd = () => {
                 fullWidth
                 type='email'
                 label='Primary Email'
+                required={true}
                 value={formData.email}
                 placeholder='johndoe@gmail.com'
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -97,6 +99,7 @@ const FormUserAdd = () => {
               <CustomTextField
                 fullWidth
                 label='Password'
+                required={true}
                 placeholder='············'
                 id='form-layout-separator-password'
                 type={formData.isPasswordShown ? 'text' : 'password'}
@@ -124,6 +127,7 @@ const FormUserAdd = () => {
               <CustomTextField
                 fullWidth
                 label='Confirm Password'
+                required={true}
                 placeholder='············'
                 id='form-layout-separator-confirm-password'
                 type={formData.isConfirmPasswordShown ? 'text' : 'password'}
@@ -159,6 +163,7 @@ const FormUserAdd = () => {
               <CustomTextField
                 fullWidth
                 label='First Name'
+                required={true}
                 placeholder='John'
                 value={formData.firstName}
                 onChange={e => setFormData({ ...formData, firstName: e.target.value })}
@@ -168,6 +173,7 @@ const FormUserAdd = () => {
               <CustomTextField
                 fullWidth
                 label='Last Name'
+                required={true}
                 placeholder='Doe'
                 value={formData.lastName}
                 onChange={e => setFormData({ ...formData, lastName: e.target.value })}
@@ -213,6 +219,7 @@ const FormUserAdd = () => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <AppReactDatepicker
                 selected={formData.date}
+                required={true}
                 showYearDropdown
                 showMonthDropdown
                 dateFormat='YYYY/MM/dd'
@@ -224,6 +231,7 @@ const FormUserAdd = () => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <AppReactDatepicker
                 selected={formData.date}
+                required={true}
                 showYearDropdown
                 showMonthDropdown
                 dateFormat='YYYY/MM/dd'
@@ -245,6 +253,7 @@ const FormUserAdd = () => {
               <CustomTextField
                 fullWidth
                 label='PF No.'
+                required={true}
                 value={formData.phoneNumber}
                 onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
               />
@@ -270,6 +279,7 @@ const FormUserAdd = () => {
                 select
                 fullWidth
                 label='Branch'
+                required={true}
                 value={formData.country}
                 onChange={e => setFormData({ ...formData, country: e.target.value })}
               >
@@ -281,6 +291,7 @@ const FormUserAdd = () => {
                 select
                 fullWidth
                 label='Division'
+                required={true}
                 value={formData.language}
                 slotProps={{
                   select: {
@@ -297,6 +308,7 @@ const FormUserAdd = () => {
                 select
                 fullWidth
                 label='Designation'
+                required={true}
                 value={formData.language}
                 slotProps={{
                   select: {
@@ -313,6 +325,7 @@ const FormUserAdd = () => {
                 select
                 fullWidth
                 label='Choose Station Head Quarter'
+                required={true}
                 value={formData.language}
                 slotProps={{
                   select: {
@@ -327,9 +340,76 @@ const FormUserAdd = () => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
                 fullWidth
-                label='Phone Number'
+                label='Mobile No.'
+                required={true}
                 type='number'
                 placeholder='123-456-7890'
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Checking Authority No'
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <AppReactDatepicker
+                selected={formData.date}
+                showYearDropdown
+                showMonthDropdown
+                required={true}
+                dateFormat='YYYY/MM/dd'
+                onChange={date => setFormData({ ...formData, date })}
+                placeholderText='YYYY/MM/DD'
+                customInput={<CustomTextField fullWidth label='Login Valid Up to' placeholder='YYYY/MM/DD' />}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Ta Sr No.'
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Incentive Amt'
+                type="number"
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Incentive Percentage %'
+                type="number"
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Pay Band'
+                type="number"
+                required={true}
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='G Pay'
+                type="number"
+                required={true}
                 value={formData.phoneNumber}
                 onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
               />
