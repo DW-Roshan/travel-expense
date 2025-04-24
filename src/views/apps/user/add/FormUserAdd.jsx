@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // MUI Imports
 import Card from '@mui/material/Card'
@@ -21,7 +21,38 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
+import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
+import { getCookie } from '@/utils/cookies'
+import { MenuProps } from '@/configs/customDataConfig'
+import { Controller, useForm } from 'react-hook-form'
+
+
+const defaultValues = {
+  username: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  firstName: '',
+  lastName: '',
+  dateOfBirth: null,
+  dateOfJoining: null,
+  gender: 'm',
+  pfNo: '',
+  fatherName: '',
+  firstClassDutyPassNo: '',
+  branch: '',
+  division: '',
+  designation: '',
+  station: '',
+  phoneNumber: '',
+  checkingAuthority: '',
+  loginValidUpto: null,
+  taSrNo: '',
+  incentiveAmt: '',
+  incentivePercentage: '',
+  payBand: '',
+  gPay: ''
+}
 
 const FormUserAdd = () => {
   // States
@@ -35,10 +66,54 @@ const FormUserAdd = () => {
     firstName: '',
     lastName: '',
     country: '',
+    pfNo: '',
+    branch: '',
+    division: '',
+    designation: '',
+    station: '',
+    checkingAuthority: '',
+    taSrNo: '',
+    incentiveAmt: '',
+    incentivePercentage: '',
+    payBand: '',
+    gPay: '',
+    firstClassDutyPassNo: '',
+    fatherName: '',
     language: [],
     date: null,
     phoneNumber: ''
   })
+
+  const [data, setData] = useState();
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      const token = await getCookie('token');
+
+      console.log("token", token.value);
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/add`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.value}`
+          }
+        });
+        const jsonData = await response.json();
+
+        console.log("jsonData", jsonData);
+        setData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+
+  }, []);
 
   const handleClickShowPassword = () => setFormData(show => ({ ...show, isPasswordShown: !show.isPasswordShown }))
 
@@ -56,379 +131,316 @@ const FormUserAdd = () => {
       firstName: '',
       lastName: '',
       country: '',
+      pfNo: '',
+      gender: '',
+      branch: '',
+      division: '',
+      designation: '',
+      station: '',
+      checkingAuthority: '',
+      taSrNo: '',
+      incentiveAmt: '',
+      incentivePercentage: '',
+      payBand: '',
+      gPay: '',
+      firstClassDutyPassNo: '',
+      fatherName: '',
       language: [],
-      date: null,
+      dateOfBirth: null,
+      dateOfJoining: null,
+      loginValidUpto: null,
       phoneNumber: ''
     })
   }
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors }
+  } = useForm({ defaultValues })
+
+  const onSubmit = async (data) => {
+
+    const token = await getCookie('token');
+
+
+
+    if(token){
+
+      console.log(token.value);
+
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/store`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token.value}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      console.log("result", result);
+      console.log('Submitted:', data)
+    }
+  }
+
+  const password = watch('password')
 
   return (
     <Card>
       <CardHeader title='Add User' />
       <Divider />
-      <form onSubmit={e => e.preventDefault()}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
           <Grid container spacing={6}>
+
+            {/* ==================== 1. Account Details ==================== */}
             <Grid size={{ xs: 12 }}>
-              <Typography variant='body2' className='font-medium'>
-                1. Account Details
-              </Typography>
+              <Typography variant="body2" className="font-medium">1. Account Details</Typography>
             </Grid>
+
+            {/* Username */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Username'
-                placeholder='johnDoe'
-                required={true}
-                value={formData.username}
-                onChange={e => setFormData({ ...formData, username: e.target.value })}
-              />
+              <Controller name="username" control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <CustomTextField fullWidth label={<>Username <span className='text-error'>*</span></>} placeholder="johnDoe"
+                    required={false}
+                    error={!!errors.username} helperText={errors.username?.message} {...field} />
+                )} />
             </Grid>
+
+            {/* Email */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                type='email'
-                label='Primary Email'
-                required={true}
-                value={formData.email}
-                placeholder='johndoe@gmail.com'
-                onChange={e => setFormData({ ...formData, email: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Password'
-                required={true}
-                placeholder='············'
-                id='form-layout-separator-password'
-                type={formData.isPasswordShown ? 'text' : 'password'}
-                value={formData.password}
-                onChange={e => setFormData({ ...formData, password: e.target.value })}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton
-                          edge='end'
-                          onClick={handleClickShowPassword}
-                          onMouseDown={e => e.preventDefault()}
-                          aria-label='toggle password visibility'
-                        >
-                          <i className={formData.isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
+              <Controller name="email" control={control}
+                rules={{
+                  required: 'This field is required.',
+                  pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: 'Invalid email' }
                 }}
-              />
+                render={({ field }) => (
+                  <CustomTextField fullWidth required={false} label={<>Primary Email <span className='text-error'>*</span></>} type="email"
+                    error={!!errors.email} helperText={errors.email?.message} {...field} />
+                )} />
             </Grid>
+
+            {/* Password */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Confirm Password'
-                required={true}
-                placeholder='············'
-                id='form-layout-separator-confirm-password'
-                type={formData.isConfirmPasswordShown ? 'text' : 'password'}
-                value={formData.confirmPassword}
-                onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton
-                          edge='end'
-                          onClick={handleClickShowConfirmPassword}
-                          onMouseDown={e => e.preventDefault()}
-                          aria-label='toggle confirm password visibility'
-                        >
-                          <i className={formData.isConfirmPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
-                }}
-              />
+              <Controller name="password" control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <CustomTextField fullWidth label={<>Password <span className='text-error'>*</span></>} required={false} placeholder="••••••••"
+                    type={showPassword ? 'text' : 'password'}
+                    error={!!errors.password} helperText={errors.password?.message}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(p => !p)}>
+                            <i className={showPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    {...field} />
+                )} />
             </Grid>
+
+            {/* Confirm Password */}
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller name="password_confirmation" control={control}
+                rules={{
+                  required: 'This field is required.',
+                  validate: value => value === password || 'Passwords do not match'
+                }}
+                render={({ field }) => (
+                  <CustomTextField fullWidth label={<>Confirm Password <span className='text-error'>*</span></>} placeholder="••••••••"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    error={!!errors.password_confirmation} helperText={errors.password_confirmation?.message}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowConfirmPassword(p => !p)}>
+                            <i className={showConfirmPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    {...field} />
+                )} />
+            </Grid>
+
+            {/* ==================== 2. Personal Info ==================== */}
+            <Grid size={{ xs: 12 }}><Divider /></Grid>
             <Grid size={{ xs: 12 }}>
-              <Divider />
+              <Typography variant="body2" className="font-medium">2. Personal Info</Typography>
             </Grid>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant='body2' className='font-medium'>
-                2. Personal Info
-              </Typography>
-            </Grid>
+
+            {/* First & Last Name */}
+            {[
+              ['firstName', 'First Name', 'John', true],
+              ['lastName', 'Last Name', 'Doe', true]
+            ].map(([name, label, placeholder, required]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>{ label } {required && <span className='text-error'>*</span> }</>} placeholder={placeholder}
+                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                  )} />
+              </Grid>
+            ))}
+
+            {/* Date of Birth */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='First Name'
-                required={true}
-                placeholder='John'
-                value={formData.firstName}
-                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-              />
+              <Controller name="dateOfBirth" control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <AppReactDatepicker
+                    selected={field.value} onChange={field.onChange}
+                    showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                    placeholderText="YYYY/MM/DD"
+                    customInput={
+                      <CustomTextField fullWidth label={<>{`Date of Birth`} {<span className='text-error'>*</span> }</>}
+                        error={!!errors.dateOfBirth} helperText={errors.dateOfBirth?.message} />
+                    }
+                  />
+                )} />
             </Grid>
+
+            {/* Gender */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Last Name'
-                required={true}
-                placeholder='Doe'
-                value={formData.lastName}
-                onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-              />
-            </Grid>
-            {/* <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Country'
-                value={formData.country}
-                onChange={e => setFormData({ ...formData, country: e.target.value })}
-              >
-                <MenuItem value=''>Select Country</MenuItem>
-                <MenuItem value='UK'>UK</MenuItem>
-                <MenuItem value='USA'>USA</MenuItem>
-                <MenuItem value='Australia'>Australia</MenuItem>
-                <MenuItem value='Germany'>Germany</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Language'
-                value={formData.language}
-                slotProps={{
-                  select: {
-                    multiple: true,
-                    onChange: e => setFormData({ ...formData, language: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value='English'>English</MenuItem>
-                <MenuItem value='French'>French</MenuItem>
-                <MenuItem value='Spanish'>Spanish</MenuItem>
-                <MenuItem value='Portuguese'>Portuguese</MenuItem>
-                <MenuItem value='Italian'>Italian</MenuItem>
-                <MenuItem value='German'>German</MenuItem>
-                <MenuItem value='Arabic'>Arabic</MenuItem>
-              </CustomTextField>
-            </Grid> */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <AppReactDatepicker
-                selected={formData.date}
-                required={true}
-                showYearDropdown
-                showMonthDropdown
-                dateFormat='YYYY/MM/dd'
-                onChange={date => setFormData({ ...formData, date })}
-                placeholderText='YYYY/MM/DD'
-                customInput={<CustomTextField fullWidth label='Date of Birth' placeholder='YYYY/MM/DD' />}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <AppReactDatepicker
-                selected={formData.date}
-                required={true}
-                showYearDropdown
-                showMonthDropdown
-                dateFormat='YYYY/MM/dd'
-                onChange={date => setFormData({ ...formData, date })}
-                placeholderText='YYYY/MM/DD'
-                customInput={<CustomTextField fullWidth label='Date of Joining' placeholder='YYYY/MM/DD' />}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl>
+              <FormControl error={!!errors.gender}>
                 <FormLabel>Gender</FormLabel>
-                <RadioGroup row defaultValue='m' aria-label='gender' name='gender'>
-                  <FormControlLabel value='m' control={<Radio />} label='Male' />
-                  <FormControlLabel value='f' control={<Radio />} label='Female' />
-                </RadioGroup>
+                <Controller name="gender" control={control}
+                  render={({ field }) => (
+                    <RadioGroup row {...field}>
+                      <FormControlLabel value="m" control={<Radio />} label="Male" />
+                      <FormControlLabel value="f" control={<Radio />} label="Female" />
+                      <FormControlLabel value="o" control={<Radio />} label="Other" />
+                    </RadioGroup>
+                  )} />
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='PF No.'
-                required={true}
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
+
+            {/* Father Name & PF No */}
+            {[
+              ['fatherName', 'Father Name'],
+              ['pfNo', 'PF No.']
+            ].map(([name, label]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={label}
+                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                  )} />
+              </Grid>
+            ))}
+
+            {/* ==================== 3. Employment Info ==================== */}
+            <Grid size={{ xs: 12 }}><Divider /></Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="body2" className="font-medium">3. Employment Info</Typography>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Father Name'
-                value={formData.firstName}
-                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-              />
+
+            {/* Date of Joining + Login Valid */}
+            {[
+              ['dateOfJoining', 'Date of Joining', true],
+              ['loginValidUpto', 'Login Valid Up To', true]
+            ].map(([name, label, required = false]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <AppReactDatepicker
+                      selected={field.value} onChange={field.onChange}
+                      showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                      placeholderText="YYYY/MM/DD"
+                      customInput={
+                        <CustomTextField fullWidth label={<>{ label } {required && <span className='text-error'>*</span> }</>}
+                          error={!!errors[name]} helperText={errors[name]?.message} />
+                      }
+                    />
+                  )} />
+              </Grid>
+            ))}
+
+            {/* Branch / Division / Designation / Station */}
+            {[
+              ['branch', 'Branch', data?.branches, 'branch_name', true],
+              ['division', 'Division', data?.divisions, 'division_name', true],
+              ['designation', 'Designation', data?.designations, 'designation_name', true],
+              ['station', 'Choose Station Head Quarter', data?.stations, 'station_name', true]
+            ].map(([name, label, options, key, required = false]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <CustomTextField select fullWidth label={<>{ label } {required && <span className='text-error'>*</span> }</>}
+                      SelectProps={{ MenuProps }}
+                      error={!!errors[name]} helperText={errors[name]?.message} {...field}>
+                      {options?.length > 0
+                        ? options.map((o, i) => <MenuItem key={i} value={o.id}>{o[key]}</MenuItem>)
+                        : <MenuItem value="">No Data</MenuItem>}
+                    </CustomTextField>
+                  )} />
+              </Grid>
+            ))}
+
+            {/* ==================== 4. Contact Info ==================== */}
+            <Grid size={{ xs: 12 }}><Divider /></Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="body2" className="font-medium">4. Contact Info</Typography>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='1st Class Duty Pass No.'
-                value={formData.firstName}
-                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-              />
+
+            {/* Phone + Checking Authority */}
+            {[
+              ['phoneNumber', 'Mobile No.', 'number', true],
+              ['checkingAuthority', 'Checking Authority No']
+            ].map(([name, label, type = 'text', required = false]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  rules={{required: required && 'This field is required.'}}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
+                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                  )} />
+              </Grid>
+            ))}
+
+            {/* ==================== 5. Salary & Incentives ==================== */}
+            <Grid size={{ xs: 12 }}><Divider /></Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="body2" className="font-medium">5. Salary & Incentives</Typography>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Branch'
-                required={true}
-                value={formData.country}
-                onChange={e => setFormData({ ...formData, country: e.target.value })}
-              >
-                <MenuItem value=''>No Data</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Division'
-                required={true}
-                value={formData.language}
-                slotProps={{
-                  select: {
-                    multiple: true,
-                    onChange: e => setFormData({ ...formData, language: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value=''>No Data</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Designation'
-                required={true}
-                value={formData.language}
-                slotProps={{
-                  select: {
-                    multiple: true,
-                    onChange: e => setFormData({ ...formData, language: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value=''>No Data</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Choose Station Head Quarter'
-                required={true}
-                value={formData.language}
-                slotProps={{
-                  select: {
-                    multiple: true,
-                    onChange: e => setFormData({ ...formData, language: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value=''>No Data</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Mobile No.'
-                required={true}
-                type='number'
-                placeholder='123-456-7890'
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Checking Authority No'
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <AppReactDatepicker
-                selected={formData.date}
-                showYearDropdown
-                showMonthDropdown
-                required={true}
-                dateFormat='YYYY/MM/dd'
-                onChange={date => setFormData({ ...formData, date })}
-                placeholderText='YYYY/MM/DD'
-                customInput={<CustomTextField fullWidth label='Login Valid Up to' placeholder='YYYY/MM/DD' />}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Ta Sr No.'
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Incentive Amt'
-                type="number"
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Incentive Percentage %'
-                type="number"
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Pay Band'
-                type="number"
-                required={true}
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='G Pay'
-                type="number"
-                required={true}
-                value={formData.phoneNumber}
-                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-              />
-            </Grid>
+
+            {[
+              ['firstClassDutyPassNo', '1st Class Duty Pass No.'],
+              ['taSrNo', 'Ta Sr No.'],
+              ['incentiveAmt', 'Incentive Amt', 'number'],
+              ['incentivePercentage', 'Incentive Percentage %', 'number'],
+              ['payBand', 'Pay Band', 'number', true],
+              ['gPay', 'G Pay', 'number', true]
+            ].map(([name, label, type = 'text', required = false]) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                <Controller name={name} control={control}
+                  rules={{ required: required && 'This field is required.' }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
+                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                  )} />
+              </Grid>
+            ))}
+
           </Grid>
         </CardContent>
+
         <Divider />
+
         <CardActions>
-          <Button type='submit' variant='contained' className='mie-2'>
-            Submit
-          </Button>
-          <Button
-            type='reset'
-            variant='tonal'
-            color='secondary'
-            onClick={() => {
-              handleReset()
-            }}
-          >
+          <Button type="submit" variant="contained">Submit</Button>
+          <Button type="button" variant="tonal" color="secondary" onClick={() => reset()}>
             Reset
           </Button>
         </CardActions>
