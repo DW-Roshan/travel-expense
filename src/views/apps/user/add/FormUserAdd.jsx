@@ -25,6 +25,8 @@ import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Sele
 import { getCookie } from '@/utils/cookies'
 import { MenuProps } from '@/configs/customDataConfig'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 
 const defaultValues = {
@@ -88,6 +90,8 @@ const FormUserAdd = () => {
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const router = useRouter();
 
   useEffect(() => {
 
@@ -157,6 +161,7 @@ const FormUserAdd = () => {
     control,
     handleSubmit,
     reset,
+    setError,
     watch,
     formState: { errors }
   } = useForm({ defaultValues })
@@ -165,12 +170,7 @@ const FormUserAdd = () => {
 
     const token = await getCookie('token');
 
-
-
     if(token){
-
-      console.log(token.value);
-
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/store`, {
         method: 'post',
@@ -182,8 +182,32 @@ const FormUserAdd = () => {
       });
 
       const result = await res.json();
-      console.log("result", result);
-      console.log('Submitted:', data)
+
+      if(res.ok){
+
+        sessionStorage.setItem('success', result.message);
+
+        router.push('/user/list');
+        
+        reset();
+        
+
+      } else if(res.status == 422) {
+
+        // Laravel returns validation errors in the `errors` object
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          setError(field, {
+            type: 'manual',
+            message: messages[0], // Use the first error message for each field
+          });
+        });
+
+      } else {
+        sessionStorage.setItem('error', result.message);
+
+        router.push('/user/list');
+        
+      }
     }
   }
 
@@ -205,7 +229,13 @@ const FormUserAdd = () => {
             {/* Username */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller name="username" control={control}
-                rules={{ required: 'This field is required.' }}
+                rules={{ 
+                  required: 'This field is required.',
+                  pattern: {
+                    value: /^[a-zA-Z0-9]+$/, // Only letters and numbers, no space or symbols
+                    message: 'Username must be alphanumeric and contain no spaces.'
+                  }
+                }}
                 render={({ field }) => (
                   <CustomTextField fullWidth label={<>Username <span className='text-error'>*</span></>} placeholder="johnDoe"
                     required={false}

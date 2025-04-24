@@ -49,6 +49,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { toast } from 'react-toastify'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -113,6 +114,22 @@ const UserListTable = ({ tableData }) => {
 
   // Hooks
   const { lang: locale } = useParams()
+
+  useEffect(() => {
+    const success = sessionStorage.getItem('success');
+
+    if(success) {
+      toast.success(success);
+      sessionStorage.removeItem('success');
+    }
+
+    const error = sessionStorage.getItem('error');
+
+    if(error) {
+      toast.error(error);
+      sessionStorage.removeItem('error');
+    }
+  }, [])
 
   const columns = useMemo(
     () => [
