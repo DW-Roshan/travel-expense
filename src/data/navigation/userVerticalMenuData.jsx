@@ -1,4 +1,4 @@
-const customVerticalMenuData = dictionary => [
+const userVerticalMenuData = dictionary => [
 
   // This is how you will normally render submenu
   {
@@ -7,21 +7,21 @@ const customVerticalMenuData = dictionary => [
     href: '/dashboards/crm'
   },
   {
-    label: dictionary['navigation'].user,
+    label: 'Traveling Allowances',
     icon: 'tabler-user',
     children: [
-        {
+      {
         label: dictionary['navigation'].list,
         icon: 'tabler-circle',
         href: '/admin/user/list'
-        },
-        {
+      },
+      {
         label: dictionary['navigation'].add,
         icon: 'tabler-circle',
         href: '/admin/user/add'
-        }
+      }
     ]
   }
 ]
 
-export default customVerticalMenuData
+export default userVerticalMenuData

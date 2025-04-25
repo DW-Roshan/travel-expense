@@ -55,3 +55,25 @@ export const getPricingData = async () => {
 export const getStatisticsData = async () => {
   return statisticsData
 }
+
+export const getUserDataL = async (token) => {
+
+  try {
+
+    const res = await fetch(`${process.env.API_URL}/admin/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const users = await res.json();
+
+    return users;
+
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return [];
+  }
+}

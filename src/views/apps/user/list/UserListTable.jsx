@@ -96,9 +96,9 @@ const userRoleObj = {
 }
 
 const userStatusObj = {
-  active: 'success',
-  pending: 'warning',
-  inactive: 'secondary'
+  1: 'success',
+  // pending: 'warning',
+  0: 'secondary'
 }
 
 // Column Definitions
@@ -116,20 +116,27 @@ const UserListTable = ({ tableData }) => {
   const { lang: locale } = useParams()
 
   useEffect(() => {
-    const success = sessionStorage.getItem('success');
+    // Ensure DOM is painted before showing toasts
+    const runAfterMount = () => {
+      const success = sessionStorage.getItem('success');
+      const error = sessionStorage.getItem('error');
 
-    if(success) {
-      toast.success(success);
-      sessionStorage.removeItem('success');
-    }
+      if (success) {
+        toast.success(success);
+        sessionStorage.removeItem('success');
+      }
 
-    const error = sessionStorage.getItem('error');
+      if (error) {
+        toast.error(error);
+        sessionStorage.removeItem('error');
+      }
+    };
 
-    if(error) {
-      toast.error(error);
-      sessionStorage.removeItem('error');
-    }
-  }, [])
+    // Run after paint
+    requestAnimationFrame(() => {
+      setTimeout(runAfterMount, 0);
+    });
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -159,41 +166,101 @@ const UserListTable = ({ tableData }) => {
         header: 'User',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original.avatar, fullName: row.original.fullName })}
+            {getAvatar({ avatar: row.original.avatar, fullName: row.original.first_name+" "+row.original.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
-                {row.original.fullName}
+                {row.original.first_name+" "+row.original.last_name}
               </Typography>
               <Typography variant='body2'>{row.original.username}</Typography>
             </div>
           </div>
         )
       }),
-      columnHelper.accessor('role', {
-        header: 'Role',
+      // columnHelper.accessor('role', {
+      //   header: 'Role',
+      //   cell: ({ row }) => (
+      //     <div className='flex items-center gap-2'>
+      //       <Icon
+      //         className={userRoleObj[row.original.role].icon}
+      //         sx={{ color: `var(--mui-palette-${userRoleObj[row.original.role].color}-main)` }}
+      //       />
+      //       <Typography className='capitalize' color='text.primary'>
+      //         {row.original.role}
+      //       </Typography>
+      //     </div>
+      //   )
+      // }),
+      columnHelper.accessor('email', {
+        header: 'Email',
         cell: ({ row }) => (
-          <div className='flex items-center gap-2'>
-            <Icon
-              className={userRoleObj[row.original.role].icon}
-              sx={{ color: `var(--mui-palette-${userRoleObj[row.original.role].color}-main)` }}
-            />
-            <Typography className='capitalize' color='text.primary'>
-              {row.original.role}
-            </Typography>
-          </div>
-        )
-      }),
-      columnHelper.accessor('currentPlan', {
-        header: 'Plan',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.currentPlan}
+          <Typography color='text.primary'>
+            {row.original.email}
           </Typography>
         )
       }),
-      columnHelper.accessor('billing', {
-        header: 'Billing',
-        cell: ({ row }) => <Typography>{row.original.billing}</Typography>
+      columnHelper.accessor('mobileNo', {
+        header: 'Mobile No.',
+        cell: ({ row }) => <Typography>{row.original.mobile_no}</Typography>
+      }),
+      columnHelper.accessor('branch', {
+        header: 'Branch',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.branch.branch_name}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('division', {
+        header: 'Division',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.division.division_name}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('designation', {
+        header: 'Designation',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.designation.designation_name}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('stationHeadQuarter', {
+        header: 'Station Head Quarter Code',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.station_head_quarter.station_name}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('checkingAuthorityNo', {
+        header: 'Checking Authority No.',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.authority_no}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('validUpto', {
+        header: 'Valid Up to',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {new Date(row.original.expiry_date).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('taSrNo', {
+        header: 'Ta Sr No.',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.ta_sr_no}
+          </Typography>
+        )
       }),
       columnHelper.accessor('status', {
         header: 'Status',
@@ -201,9 +268,9 @@ const UserListTable = ({ tableData }) => {
           <div className='flex items-center gap-3'>
             <Chip
               variant='tonal'
-              label={row.original.status}
+              label={row.original.is_active == 1 ? 'Active' : 'Inactive'}
               size='small'
-              color={userStatusObj[row.original.status]}
+              color={userStatusObj[row.original.is_active]}
               className='capitalize'
             />
           </div>
@@ -213,15 +280,18 @@ const UserListTable = ({ tableData }) => {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
+            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
               <i className='tabler-trash text-textSecondary' />
+            </IconButton> */}
+            <IconButton>
+              {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
+                <i className='tabler-eye text-textSecondary' />
+              {/* </Link> */}
             </IconButton>
             <IconButton>
-              <Link href={getLocalizedUrl('/user/view', locale)} className='flex'>
-                <i className='tabler-eye text-textSecondary' />
-              </Link>
+              <i className='tabler-edit text-textSecondary' />
             </IconButton>
-            <OptionMenu
+            {/* <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
               options={[
@@ -236,7 +306,7 @@ const UserListTable = ({ tableData }) => {
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
                 }
               ]}
-            />
+            /> */}
           </div>
         ),
         enableSorting: false
@@ -316,7 +386,7 @@ const UserListTable = ({ tableData }) => {
             >
               Export
             </Button>
-            <Link href={getLocalizedUrl('/user/add', locale)}>
+            <Link href={getLocalizedUrl('/admin/user/add', locale)}>
               <Button
                 variant='contained'
                 startIcon={<i className='tabler-plus' />}

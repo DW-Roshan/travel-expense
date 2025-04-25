@@ -98,9 +98,8 @@ const FormUserAdd = () => {
     const fetchData = async () => {
       const token = await getCookie('token');
 
-      console.log("token", token.value);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/add`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/add`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token.value}`
@@ -108,10 +107,14 @@ const FormUserAdd = () => {
         });
         const jsonData = await response.json();
 
-        console.log("jsonData", jsonData);
+        // if(response.status === 401) {
+        //   router.push('/not-authorized');
+        // }
+
         setData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setData(null);
       }
     };
 
@@ -172,7 +175,7 @@ const FormUserAdd = () => {
 
     if(token){
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/store`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/store`, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -187,10 +190,10 @@ const FormUserAdd = () => {
 
         sessionStorage.setItem('success', result.message);
 
-        router.push('/user/list');
-        
+        router.push('/admin/user/list');
+
         reset();
-        
+
 
       } else if(res.status == 422) {
 
@@ -205,8 +208,8 @@ const FormUserAdd = () => {
       } else {
         sessionStorage.setItem('error', result.message);
 
-        router.push('/user/list');
-        
+        router.push('/admin/user/list');
+
       }
     }
   }
@@ -229,7 +232,7 @@ const FormUserAdd = () => {
             {/* Username */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller name="username" control={control}
-                rules={{ 
+                rules={{
                   required: 'This field is required.',
                   pattern: {
                     value: /^[a-zA-Z0-9]+$/, // Only letters and numbers, no space or symbols
@@ -452,16 +455,27 @@ const FormUserAdd = () => {
               ['incentivePercentage', 'Incentive Percentage %', 'number'],
               ['payBand', 'Pay Band', 'number', true],
               ['gPay', 'G Pay', 'number', true]
-            ].map(([name, label, type = 'text', required = false]) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={name}>
-                <Controller name={name} control={control}
-                  rules={{ required: required && 'This field is required.' }}
-                  render={({ field }) => (
-                    <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
-                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
-                  )} />
-              </Grid>
-            ))}
+            ].map(([name, label, type = 'text', required = false]) => {
+              const isLimitedField = name === 'gPay' || name === 'payBand';
+              return (
+                <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                  <Controller name={name} control={control}
+                    rules={{
+                      required: required && 'This field is required.',
+                      ...(isLimitedField && {
+                        maxLength: {
+                          value: 8,
+                          message: 'Maximum 8 characters allowed'
+                        }
+                      })
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
+                        error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                    )} />
+                </Grid>
+              )
+            })}
 
           </Grid>
         </CardContent>
