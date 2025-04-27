@@ -4,7 +4,7 @@ const customVerticalMenuData = dictionary => [
   {
     label: dictionary['navigation'].dashboard,
     icon: 'tabler-smart-home',
-    href: '/dashboards/crm'
+    href: '/admin/dashboard'
   },
   {
     label: dictionary['navigation'].user,

@@ -4,7 +4,7 @@ const userVerticalMenuData = dictionary => [
   {
     label: dictionary['navigation'].dashboard,
     icon: 'tabler-smart-home',
-    href: '/dashboards/crm'
+    href: '/dashboard'
   },
   {
     label: 'Traveling Allowances',
@@ -13,12 +13,12 @@ const userVerticalMenuData = dictionary => [
       {
         label: dictionary['navigation'].list,
         icon: 'tabler-circle',
-        href: '/admin/user/list'
+        href: '/traveling-allowances/list'
       },
       {
         label: dictionary['navigation'].add,
         icon: 'tabler-circle',
-        href: '/admin/user/add'
+        href: '/traveling-allowances/add'
       }
     ]
   }

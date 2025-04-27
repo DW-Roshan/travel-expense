@@ -21,7 +21,7 @@ const noResultData = [
   },
   {
     label: 'CRM',
-    href: '/dashboards/crm',
+    href: '/dashboard',
     icon: 'tabler-chart-donut-3'
   }
 ]

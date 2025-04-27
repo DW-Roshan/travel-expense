@@ -16,13 +16,10 @@ import ActivityTimeline from '@views/dashboards/crm/ActivityTimeline'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
-import { redirect } from 'next/navigation'
 
 const DashboardCRM = async () => {
   // Vars
   const serverMode = await getServerMode()
-
-  return redirect('/dashboard');
 
   return (
     <Grid container spacing={6}>

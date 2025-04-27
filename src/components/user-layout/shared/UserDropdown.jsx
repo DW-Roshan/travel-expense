@@ -51,7 +51,7 @@ const UserDropdown = () => {
 
   // Hooks
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session } = []
   const { settings } = useSettings()
   const { lang: locale } = useParams()
 

@@ -9,12 +9,13 @@ import themeConfig from '@configs/themeConfig'
 
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
+import { getCookie } from '@/utils/cookies'
 
 const GuestOnlyRoute = async ({ children, lang }) => {
-  const session = await getServerSession()
+  const session = await getCookie('token')
 
   if (session) {
-    redirect(getLocalizedUrl(themeConfig.homePageUrl, lang))
+    redirect(getLocalizedUrl('/dashboard', lang))
   }
 
   return <>{children}</>

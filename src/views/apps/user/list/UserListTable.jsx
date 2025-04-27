@@ -166,12 +166,12 @@ const UserListTable = ({ tableData }) => {
         header: 'User',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original.avatar, fullName: row.original.first_name+" "+row.original.last_name })}
+            {getAvatar({ avatar: row.original?.profile_image, fullName: row.original?.first_name+" "+row.original?.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
-                {row.original.first_name+" "+row.original.last_name}
+                {row.original?.first_name+" "+row.original?.last_name}
               </Typography>
-              <Typography variant='body2'>{row.original.username}</Typography>
+              <Typography variant='body2'>{row.original?.username}</Typography>
             </div>
           </div>
         )
@@ -181,11 +181,11 @@ const UserListTable = ({ tableData }) => {
       //   cell: ({ row }) => (
       //     <div className='flex items-center gap-2'>
       //       <Icon
-      //         className={userRoleObj[row.original.role].icon}
-      //         sx={{ color: `var(--mui-palette-${userRoleObj[row.original.role].color}-main)` }}
+      //         className={userRoleObj[row.original?.role].icon}
+      //         sx={{ color: `var(--mui-palette-${userRoleObj[row.original?.role].color}-main)` }}
       //       />
       //       <Typography className='capitalize' color='text.primary'>
-      //         {row.original.role}
+      //         {row.original?.role}
       //       </Typography>
       //     </div>
       //   )
@@ -194,19 +194,19 @@ const UserListTable = ({ tableData }) => {
         header: 'Email',
         cell: ({ row }) => (
           <Typography color='text.primary'>
-            {row.original.email}
+            {row.original?.email}
           </Typography>
         )
       }),
       columnHelper.accessor('mobileNo', {
         header: 'Mobile No.',
-        cell: ({ row }) => <Typography>{row.original.mobile_no}</Typography>
+        cell: ({ row }) => <Typography>{row.original?.mobile_no}</Typography>
       }),
       columnHelper.accessor('branch', {
         header: 'Branch',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.branch.branch_name}
+            {row.original?.branch?.branch_name}
           </Typography>
         )
       }),
@@ -214,7 +214,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Division',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.division.division_name}
+            {row.original?.division?.division_name}
           </Typography>
         )
       }),
@@ -222,7 +222,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Designation',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.designation.designation_name}
+            {row.original?.designation?.designation_name}
           </Typography>
         )
       }),
@@ -230,7 +230,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Station Head Quarter Code',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.station_head_quarter.station_name}
+            {row.original?.station_head_quarter?.station_name}
           </Typography>
         )
       }),
@@ -238,7 +238,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Checking Authority No.',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.authority_no}
+            {row.original?.authority_no}
           </Typography>
         )
       }),
@@ -246,7 +246,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Valid Up to',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {new Date(row.original.expiry_date).toLocaleDateString('en-GB', {
+            {new Date(row.original?.expiry_date).toLocaleDateString('en-GB', {
               day: '2-digit',
               month: 'short',
               year: 'numeric'
@@ -258,7 +258,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Ta Sr No.',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.ta_sr_no}
+            {row.original?.ta_sr_no}
           </Typography>
         )
       }),
@@ -268,9 +268,9 @@ const UserListTable = ({ tableData }) => {
           <div className='flex items-center gap-3'>
             <Chip
               variant='tonal'
-              label={row.original.is_active == 1 ? 'Active' : 'Inactive'}
+              label={row.original?.is_active == 1 ? 'Active' : 'Inactive'}
               size='small'
-              color={userStatusObj[row.original.is_active]}
+              color={userStatusObj[row.original?.is_active]}
               className='capitalize'
             />
           </div>
@@ -280,7 +280,7 @@ const UserListTable = ({ tableData }) => {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
+            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
@@ -332,7 +332,7 @@ const UserListTable = ({ tableData }) => {
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
+    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),

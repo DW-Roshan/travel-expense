@@ -151,11 +151,18 @@ const Login = ({ mode }) => {
 
       // Store the token in a cookie for future requests
       // setCookie('auth_token', token, 7); // Token expires in 7 days
+      const userType = responseData.user_type;
+      if(userType == 'A'){
+        router.replace(getLocalizedUrl('/admin/dashboard', locale));
+      } else {
 
-      // Vars
-      const redirectURL = searchParams.get('redirectTo') ?? '/'
+        // Vars
+        const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
+  
+  
+        router.replace(getLocalizedUrl(redirectURL, locale))
+      }
 
-      router.replace(getLocalizedUrl(redirectURL, locale))
     } else {
 
       const errorData = await res.json(); // Parse the error response as JSON

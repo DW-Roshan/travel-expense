@@ -21,7 +21,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
 // Third-party Imports
-import { signOut, useSession } from 'next-auth/react'
+// import { signOut, useSession } from 'next-auth/react'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -51,7 +51,7 @@ const UserDropdown = () => {
 
   // Hooks
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session } = []
   const { settings } = useSettings()
   const { lang: locale } = useParams()
 
