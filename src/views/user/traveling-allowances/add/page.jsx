@@ -21,7 +21,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
+import { FormControl, FormControlLabel, FormHelperText, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
 import { getCookie } from '@/utils/cookies'
 import { MenuProps } from '@/configs/customDataConfig'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -70,7 +70,7 @@ const trainOptions = [
     { value: '13256', label: '13256' },
     { value: '19308', label: '19308' },
   ];
-  
+
   const stationOptions = [
     { value: '1', label: 'A N Dev Nagar' },
     { value: '2', label: 'Abhaipur' },
@@ -81,7 +81,7 @@ const trainOptions = [
     { value: '7', label: 'Achhnera Junction' },
     { value: '8', label: 'Adas Road' },
   ];
-  
+
   const timeOptions = Array.from({ length: 10 }, (_, i) => {
     const mins = (i * 5).toString().padStart(2, '0');
     return `00:${mins}:00`;
@@ -130,7 +130,7 @@ const FormTravelingAllowanceAdd = () => {
       const token = await getCookie('token');
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/add`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/add`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token.value}`
@@ -247,18 +247,17 @@ const FormTravelingAllowanceAdd = () => {
 
 //   const password = watch('password')
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       journeys: [
         {
-          fromDate: '',
+          departureDate: '',
           trainId: '',
-          leftTime: '',
+          departureTime: '',
           arrivedDate: '',
           arrivedTime: '',
           fromStation: '',
           toStation: '',
-          objectOfJourney: '',
         },
       ],
     },
@@ -274,228 +273,277 @@ const FormTravelingAllowanceAdd = () => {
   };
 
   return (
-    <Card>
+    <Card className='overflow-visible'>
       <CardHeader title='Add Traveling Allowance' />
       <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
-          <Grid container spacing={6}>
+          <Grid container>
             <Grid size={{ xs: 12 }}>
               {fields.map((item, index) => (
                 <div
                   key={index}
                   className={classNames('repeater-item flex relative mbe-4 border rounded')}
                 >
-                {/* <Box key={item.id} sx={{ border: '1px solid #ccc', p: 2, mb: 3, borderRadius: 2 }}> */}
-                  <Grid container spacing={2} className='flex-1 m-0 p-5'>
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                        <Controller name={`journeys[${index}].fromDate`} control={control}
-                          rules={{ required: 'This field is required.' }}
-                          render={({ field }) => (
-                            <AppReactDatepicker
-                              selected={field.value} onChange={field.onChange}
-                              showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
-                              placeholderText="YYYY/MM/DD"
-                              customInput={
-                                <TextField
-                                  {...field}
-                                  label={<>Departure Date {<span className='text-error'>*</span> }</>}
-                                  fullWidth
-                                  required
-                                />
-                              }
+                  <Grid container spacing={5} className='flex-1 m-0 p-5'>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <Controller
+                        name={`journeys[${index}].trainId`}
+                        control={control}
+                        rules={{ required: 'This field is required.' }}
+                        render={({ field }) => (
+                          <CustomTextField
+                            select
+                            fullWidth
+                            label='Train No.'
+                            {...field}
+                            error={Boolean(errors?.journeys?.[index]?.trainId)}
+                            helperText={errors?.journeys?.[index]?.trainId?.message}
+                            SelectProps={{ MenuProps }}
+                          >
+                            {data?.trains && data.trains.length ? data.trains.map((train) => (
+                              <MenuItem key={train.id} value={train.id}>
+                                {train.train_no}
+                              </MenuItem>
+                            )) :(
+                              <MenuItem>No records found</MenuItem>
+                            )}
+                          </CustomTextField>
+                          // <FormControl fullWidth >
+                          //     <InputLabel>Train No.</InputLabel>
+                          //     <Select {...field} label="Train No." error={Boolean(errors?.journeys?.[index]?.trainId)}>
+                          //     {data?.trains && data.trains.length ? data.trains.map((train) => (
+                          //       <MenuItem key={train.id} value={train.id}>
+                          //         {train.train_no}
+                          //       </MenuItem>
+                          //     )) :(
+                          //       <MenuItem>No records found</MenuItem>
+                          //     )}
+                          //     </Select>
+                          // </FormControl>
+                        )}
+                      />
+                      {errors?.journeys?.[index]?.trainId && <FormHelperText error>{errors?.journeys?.[index]?.trainId.message}</FormHelperText>}
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <Controller
+                        name={`journeys[${index}].fromStation`}
+                        control={control}
+                        render={({ field }) => (
+                          <CustomTextField
+                            select
+                            fullWidth
+                            label='Form Station'
+                            {...field}
+                            SelectProps={{ MenuProps }}
+                          >
+                            {data?.stations && data?.stations.length > 0 ? data?.stations.map((station) => (
+                              <MenuItem key={station.id} value={station.id}>
+                              {station.station_name}
+                              </MenuItem>
+                            )) : (
+                              <MenuItem>No records found</MenuItem>
+                            )}
+                          </CustomTextField>
+                        )}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <Controller
+                        name={`journeys[${index}].toStation`}
+                        control={control}
+                        render={({ field }) => (
+                          <CustomTextField
+                            select
+                            fullWidth
+                            label='To Station'
+                            {...field}
+                          >
+                            {data?.stations && data?.stations.length > 0 ? data?.stations.map((station) => (
+                              <MenuItem key={station.id} value={station.id}>
+                              {station.station_name}
+                              </MenuItem>
+                            )) : (
+                              <MenuItem>No records found</MenuItem>
+                            )}
+                          </CustomTextField>
+                        )}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 3 }}>
+                      <Controller name={`journeys[${index}].departureDate`} control={control}
+                        rules={{
+                          required: 'This field is required.',
+                          validate: (_, allValues) => {
+
+                            if (index === 0) return true; // Skip first item
+
+                            const currentFromDate = allValues?.journeys?.[index]?.departureDate;
+                            const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
+
+                            const prevArrivedDate = allValues?.journeys?.[index - 1]?.arrivedDate;
+                            const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
+
+                            if (!currentFromDate || !currentLeftTime || !prevArrivedDate || !prevArrivedTime) return true;
+
+                            const currentDeparture = new Date(currentFromDate);
+                            const currentTime = new Date(currentLeftTime);
+                            currentDeparture.setHours(currentTime.getHours(), currentTime.getMinutes());
+
+                            const previousArrival = new Date(prevArrivedDate);
+                            const prevTime = new Date(prevArrivedTime);
+                            previousArrival.setHours(prevTime.getHours(), prevTime.getMinutes());
+
+                            return currentDeparture > previousArrival || 'Departure Time must be greater then previous Arrival Time.';
+                          }
+                        }}
+                        render={({ field }) => (
+                          <AppReactDatepicker
+                            selected={field.value} onChange={field.onChange}
+                            showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
+                            placeholderText="YYYY/MM/DD HH:mm"
+                            // maxDate={new Date()}
+                            customInput={
+                              <CustomTextField
+                                {...field}
+                                label={<>Departure Date and Time {<span className='text-error'>*</span> }</>}
+                                fullWidth
+                                required
+                                helperText={errors?.journeys?.[index]?.departureDate?.message}
+                                error={Boolean(errors?.journeys?.[index]?.departureDate)}
+                              />
+                            }
+                          />
+                        )}
+                      />
+                    </Grid>
+                    {/* <Grid size={{ xs: 12, sm: 3 }}>
+                      <Controller
+                        name={`journeys[${index}].departureTime`}
+                        rules={{
+                          required: 'This field is required.',
+                          validate: (_, allValues) => {
+
+                            if (index === 0) return true; // Skip first item
+
+                            const currentFromDate = allValues?.journeys?.[index]?.departureDate;
+                            const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
+
+                            const prevArrivedDate = allValues?.journeys?.[index - 1]?.arrivedDate;
+                            const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
+
+                            if (!currentFromDate || !currentLeftTime || !prevArrivedDate || !prevArrivedTime) return true;
+
+                            const currentDeparture = new Date(currentFromDate);
+                            const currentTime = new Date(currentLeftTime);
+                            currentDeparture.setHours(currentTime.getHours(), currentTime.getMinutes());
+
+                            const previousArrival = new Date(prevArrivedDate);
+                            const prevTime = new Date(prevArrivedTime);
+                            previousArrival.setHours(prevTime.getHours(), prevTime.getMinutes());
+
+                            return currentDeparture > previousArrival || 'Departure Time must be greater then previous Arrival Time.';
+                          }
+                        }}
+                        control={control}
+                        render={({ field }) => (
+                          <AppReactDatepicker
+                            selected={field.value} onChange={field.onChange}
+                            showTimeSelect
+                            timeIntervals={5}
+                            showTimeSelectOnly
+                            dateFormat='h:mm aa'
+                            placeholderText="h:mm aa"
+                            customInput={
+                              <TextField
+                                {...field}
+                                label={<>Departure Time {<span className='text-error'>*</span> }</>}
+                                fullWidth
+                                required
+                              />
+                            }
+                          />
+                        )}
+                      />
+                    </Grid> */}
+                    <Grid size={{ xs: 12, sm: 3 }}>
+                      <Controller
+                        name={`journeys[${index}].arrivedDate`}
+                        rules={{ required: 'This field is required.' }}
+                        control={control}
+                        render={({ field }) => (
+                          <AppReactDatepicker
+                            selected={field.value} onChange={field.onChange}
+                            showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
+                            placeholderText="YYYY/MM/DD HH:mm"
+                            maxDate={new Date()}
+                            customInput={
+                              <CustomTextField
+                                {...field}
+                                label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
+                                fullWidth
+                                required
+                              />
+                            }
+                          />
+                        )}
+                      />
+                    </Grid>
+                    {/* <Grid size={{ xs: 12, sm: 3 }}>
+                      <Controller
+                        name={`journeys[${index}].arrivedTime`}
+                        control={control}
+                        render={({ field }) => (
+                          <AppReactDatepicker
+                          selected={field.value} onChange={field.onChange}
+                          showTimeSelect
+                          timeIntervals={5}
+                          showTimeSelectOnly
+                          dateFormat='h:mm aa'
+                          placeholderText="h:mm aa"
+                          customInput={
+                            <TextField
+                              {...field}
+                              label={<>Arrived Time {<span className='text-error'>*</span> }</>}
+                              fullWidth
+                              required
                             />
-                          )} 
+                          }
                         />
-                      </Grid>
-
-                      {/* <Grid size={{ xs: 12, sm: 3 }}>
-                        <Controller
-                          name={`journeys[${index}].fromDate`}
-                          control={control}
-                          render={({ field }) => (
-                          <TextField
-                              {...field}
-                              label="From Date"
-                              type="date"
-                              fullWidth
-                              required
-                          />
-                          )}
-                        />
-                      </Grid> */}
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].trainId`}
-                          control={control}
-                          render={({ field }) => (
-                          <FormControl fullWidth required>
-                              <InputLabel>Train No.</InputLabel>
-                              <Select {...field} label="Train No.">
-                              {trainOptions.map((train) => (
-                                  <MenuItem key={train.value} value={train.value}>
-                                  {train.label}
-                                  </MenuItem>
-                              ))}
-                              </Select>
-                          </FormControl>
-                          )}
+                        )}
                       />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].leftTime`}
-                          control={control}
-                          render={({ field }) => (
-                          <FormControl fullWidth required>
-                              <InputLabel>Left Time</InputLabel>
-                              <Select {...field} label="Left Time">
-                              {timeOptions.map((time) => (
-                                  <MenuItem key={time} value={time}>
-                                  {time}
-                                  </MenuItem>
-                              ))}
-                              </Select>
-                          </FormControl>
-                          )}
-                      />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].arrivedDate`}
-                          control={control}
-                          render={({ field }) => (
-                          <TextField
-                              {...field}
-                              label="Arrived Date"
-                              type="date"
-                              fullWidth
-                              InputLabelProps={{ shrink: true }}
-                              required
-                          />
-                          )}
-                      />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].arrivedTime`}
-                          control={control}
-                          render={({ field }) => (
-                          <FormControl fullWidth required>
-                              <InputLabel>Arrived Time</InputLabel>
-                              <Select {...field} label="Arrived Time">
-                              {timeOptions.map((time) => (
-                                  <MenuItem key={time} value={time}>
-                                  {time}
-                                  </MenuItem>
-                              ))}
-                              </Select>
-                          </FormControl>
-                          )}
-                      />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].fromStation`}
-                          control={control}
-                          render={({ field }) => (
-                          <FormControl fullWidth required>
-                              <InputLabel>From Station</InputLabel>
-                              <Select {...field} label="From Station">
-                              {stationOptions.map((station) => (
-                                  <MenuItem key={station.value} value={station.value}>
-                                  {station.label}
-                                  </MenuItem>
-                              ))}
-                              </Select>
-                          </FormControl>
-                          )}
-                      />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                          name={`journeys[${index}].toStation`}
-                          control={control}
-                          render={({ field }) => (
-                          <FormControl fullWidth required>
-                              <InputLabel>To Station</InputLabel>
-                              <Select {...field} label="To Station">
-                              {stationOptions.map((station) => (
-                                  <MenuItem key={station.value} value={station.value}>
-                                  {station.label}
-                                  </MenuItem>
-                              ))}
-                              </Select>
-                          </FormControl>
-                          )}
-                      />
-                      </Grid>
-
-                      {/* <Grid size={{ xs: 12 }}>
-                      <Controller
-                          name={`journeys[${index}].objectOfJourney`}
-                          control={control}
-                          render={({ field }) => (
-                          <TextField
-                              {...field}
-                              label="Object Of Journey"
-                              fullWidth
-                              multiline
-                              rows={2}
-                          />
-                          )}
-                      />
-                      </Grid> */}
-                      
-                      
-                      {/* <Grid size={{ xs: 12 }}>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => remove(index)}
-                        >
-                            Delete
-                        </Button>
-                      </Grid> */}
+                    </Grid> */}
                   </Grid>
-                  <div className='flex flex-col justify-start border-is'>
-                    <IconButton size='small' onClick={() => remove(index)}>
-                      <i className='tabler-x text-2xl text-actionActive' />
-                    </IconButton>
-                  </div>
-                {/* </Box> */}
-              </div>
-            ))}
+                  {index !== 0 && (
+                    <div className='flex flex-col justify-start border-is'>
+                      <IconButton size='small' color='error' onClick={() => remove(index)}>
+                        <i className='tabler-x text-2xl' />
+                      </IconButton>
+                    </div>
+                  )}
+                </div>
+              ))}
             </Grid>
-
             <Grid size={{ xs: 12 }}>
               <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() =>
-                  append({
-                      fromDate: '',
-                      trainId: '',
-                      leftTime: '',
-                      arrivedDate: '',
-                      arrivedTime: '',
-                      fromStation: '',
-                      toStation: '',
-                      objectOfJourney: '',
-                  })
-                  }
+                size='small'
+                variant="tonal"
+                color="primary"
+                onClick={() =>
+                append({
+                  departureDate: '',
+                  trainId: '',
+                  departureTime: '',
+                  arrivedDate: '',
+                  arrivedTime: '',
+                  fromStation: '',
+                  toStation: '',
+                })
+                }
               >
-                  Add More
+                Add More
               </Button>
             </Grid>
-
-
           </Grid>
         </CardContent>
 
