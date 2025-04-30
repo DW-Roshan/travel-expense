@@ -21,7 +21,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import { FormControl, FormControlLabel, FormHelperText, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
+import { Chip, FormControl, FormControlLabel, FormHelperText, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
 import { getCookie } from '@/utils/cookies'
 import { MenuProps } from '@/configs/customDataConfig'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -247,7 +247,7 @@ const FormTravelingAllowanceAdd = () => {
 
 //   const password = watch('password')
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: {
       journeys: [
         {
@@ -280,174 +280,229 @@ const FormTravelingAllowanceAdd = () => {
         <CardContent>
           <Grid container>
             <Grid size={{ xs: 12 }}>
-              {fields.map((item, index) => (
-                <div
-                  key={index}
-                  className={classNames('repeater-item flex relative mbe-4 border rounded')}
-                >
-                  <Grid container spacing={5} className='flex-1 m-0 p-5'>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <Controller
-                        name={`journeys[${index}].trainId`}
-                        control={control}
-                        rules={{ required: 'This field is required.' }}
-                        render={({ field }) => (
-                          <CustomTextField
-                            select
-                            fullWidth
-                            label='Train No.'
-                            {...field}
-                            error={Boolean(errors?.journeys?.[index]?.trainId)}
-                            helperText={errors?.journeys?.[index]?.trainId?.message}
-                            SelectProps={{ MenuProps }}
-                          >
-                            {data?.trains && data.trains.length ? data.trains.map((train) => (
-                              <MenuItem key={train.id} value={train.id}>
-                                {train.train_no}
-                              </MenuItem>
-                            )) :(
-                              <MenuItem>No records found</MenuItem>
-                            )}
-                          </CustomTextField>
-                          // <FormControl fullWidth >
-                          //     <InputLabel>Train No.</InputLabel>
-                          //     <Select {...field} label="Train No." error={Boolean(errors?.journeys?.[index]?.trainId)}>
-                          //     {data?.trains && data.trains.length ? data.trains.map((train) => (
-                          //       <MenuItem key={train.id} value={train.id}>
-                          //         {train.train_no}
-                          //       </MenuItem>
-                          //     )) :(
-                          //       <MenuItem>No records found</MenuItem>
-                          //     )}
-                          //     </Select>
-                          // </FormControl>
-                        )}
-                      />
-                      {errors?.journeys?.[index]?.trainId && <FormHelperText error>{errors?.journeys?.[index]?.trainId.message}</FormHelperText>}
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <Controller
-                        name={`journeys[${index}].fromStation`}
-                        control={control}
-                        render={({ field }) => (
-                          <CustomTextField
-                            select
-                            fullWidth
-                            label='Form Station'
-                            {...field}
-                            SelectProps={{ MenuProps }}
-                          >
-                            {data?.stations && data?.stations.length > 0 ? data?.stations.map((station) => (
-                              <MenuItem key={station.id} value={station.id}>
-                              {station.station_name}
-                              </MenuItem>
-                            )) : (
-                              <MenuItem>No records found</MenuItem>
-                            )}
-                          </CustomTextField>
-                        )}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <Controller
-                        name={`journeys[${index}].toStation`}
-                        control={control}
-                        render={({ field }) => (
-                          <CustomTextField
-                            select
-                            fullWidth
-                            label='To Station'
-                            {...field}
-                          >
-                            {data?.stations && data?.stations.length > 0 ? data?.stations.map((station) => (
-                              <MenuItem key={station.id} value={station.id}>
-                              {station.station_name}
-                              </MenuItem>
-                            )) : (
-                              <MenuItem>No records found</MenuItem>
-                            )}
-                          </CustomTextField>
-                        )}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller name={`journeys[${index}].departureDate`} control={control}
-                        rules={{
-                          required: 'This field is required.',
-                          validate: (_, allValues) => {
+              {fields.map((item, index) => {
+                const fromStation = watch(`journeys[${index}].fromStation`);
+                const toStation = watch(`journeys[${index}].toStation`);
+                return (
+                  <div
+                    key={index}
+                    className={classNames('repeater-item flex relative mbe-4 border rounded')}
+                  >
+                    <Grid container spacing={5} className='flex-1 m-0 p-5'>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Controller
+                          name={`journeys[${index}].trainId`}
+                          control={control}
+                          rules={{ required: 'This field is required.' }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              select
+                              fullWidth
+                              label={<>Train No. {<span className='text-error'>*</span> }</>}
+                              {...field}
+                              error={Boolean(errors?.journeys?.[index]?.trainId)}
+                              helperText={errors?.journeys?.[index]?.trainId?.message}
+                              SelectProps={{ MenuProps }}
+                            >
+                              {data?.trains && data.trains.length ? data.trains.map((train) => (
+                                <MenuItem key={train.id} value={train.id}>
+                                  {train.train_no}
+                                </MenuItem>
+                              )) :(
+                                <MenuItem>No records found</MenuItem>
+                              )}
+                            </CustomTextField>
+                          )}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Controller
+                          name={`journeys[${index}].fromStation`}
+                          control={control}
+                          rules={{ required: 'This field is required.' }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              select
+                              fullWidth
+                              label={<>Form Station {<span className='text-error'>*</span> }</>}
+                              {...field}
+                              SelectProps={{ MenuProps }}
+                              helperText={errors?.journeys?.[index]?.fromStation?.message}
+                              error={Boolean(errors?.journeys?.[index]?.fromStation)}
+                            >
+                              {data?.stations && data?.stations.length > 0 ? data?.stations.filter((station) => station.id !== toStation).map((station) => (
+                                <MenuItem key={station.id} value={station.id}>
+                                  <div className='w-full flex justify-between gap-1'>
+                                    {station.station_name}
+                                    <Chip label={station.station_code} size='small' variant='tonal' color='success' />
+                                  </div>
+                                </MenuItem>
+                              )) : (
+                                <MenuItem>No records found</MenuItem>
+                              )}
+                            </CustomTextField>
+                          )}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Controller
+                          name={`journeys[${index}].toStation`}
+                          control={control}
+                          rules={{ required: 'This field is required.' }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              select
+                              fullWidth
+                              label={<>To Station {<span className='text-error'>*</span> }</>}
+                              {...field}
+                              SelectProps={{ MenuProps }}
+                              helperText={errors?.journeys?.[index]?.toStation?.message}
+                              error={Boolean(errors?.journeys?.[index]?.toStation)}
+                            >
+                              {data?.stations && data?.stations.length > 0 ? data?.stations.filter((station) => station.id !== fromStation).map((station) => (
+                                <MenuItem key={station.id} value={station.id}>
+                                  <div className='w-full flex justify-between gap-1'>
+                                    {station.station_name}
+                                    <Chip label={station.station_code} size='small' variant='tonal' color='success' />
+                                  </div>
+                                </MenuItem>
+                              )) : (
+                                <MenuItem>No records found</MenuItem>
+                              )}
+                            </CustomTextField>
+                          )}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 3 }}>
+                        <Controller name={`journeys[${index}].departureDate`} control={control}
+                          rules={{
+                            required: 'This field is required.',
+                            validate: (_, allValues) => {
 
-                            if (index === 0) return true; // Skip first item
+                              if (index === 0) return true; // Skip first item
 
-                            const currentFromDate = allValues?.journeys?.[index]?.departureDate;
-                            const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
+                              const currentDeparture = allValues?.journeys?.[index]?.departureDate;
+                              const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
 
-                            const prevArrivedDate = allValues?.journeys?.[index - 1]?.arrivedDate;
-                            const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
+                              const prevArrival = allValues?.journeys?.[index - 1]?.arrivedDate;
+                              const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
 
-                            if (!currentFromDate || !currentLeftTime || !prevArrivedDate || !prevArrivedTime) return true;
+                              if (!currentDeparture || !prevArrival ) return true;
 
-                            const currentDeparture = new Date(currentFromDate);
-                            const currentTime = new Date(currentLeftTime);
-                            currentDeparture.setHours(currentTime.getHours(), currentTime.getMinutes());
-
-                            const previousArrival = new Date(prevArrivedDate);
-                            const prevTime = new Date(prevArrivedTime);
-                            previousArrival.setHours(prevTime.getHours(), prevTime.getMinutes());
-
-                            return currentDeparture > previousArrival || 'Departure Time must be greater then previous Arrival Time.';
-                          }
-                        }}
-                        render={({ field }) => (
-                          <AppReactDatepicker
-                            selected={field.value} onChange={field.onChange}
-                            showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
-                            placeholderText="YYYY/MM/DD HH:mm"
-                            // maxDate={new Date()}
-                            customInput={
-                              <CustomTextField
-                                {...field}
-                                label={<>Departure Date and Time {<span className='text-error'>*</span> }</>}
-                                fullWidth
-                                required
-                                helperText={errors?.journeys?.[index]?.departureDate?.message}
-                                error={Boolean(errors?.journeys?.[index]?.departureDate)}
-                              />
+                              return new Date(currentDeparture) > new Date(prevArrival) || 'Departure Time must be greater then previous Arrival Time.';
                             }
-                          />
-                        )}
-                      />
-                    </Grid>
-                    {/* <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                        name={`journeys[${index}].departureTime`}
-                        rules={{
-                          required: 'This field is required.',
-                          validate: (_, allValues) => {
+                          }}
+                          render={({ field }) => (
+                            <AppReactDatepicker
+                              selected={field.value} onChange={field.onChange}
+                              showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
+                              placeholderText="YYYY/MM/DD HH:mm"
+                              // maxDate={new Date()}
+                              customInput={
+                                <CustomTextField
+                                  {...field}
+                                  label={<>Departure Date and Time {<span className='text-error'>*</span> }</>}
+                                  fullWidth
+                                  required
+                                  helperText={errors?.journeys?.[index]?.departureDate?.message}
+                                  error={Boolean(errors?.journeys?.[index]?.departureDate)}
+                                />
+                              }
+                            />
+                          )}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 3 }}>
+                        <Controller
+                          name={`journeys[${index}].arrivedDate`}
+                          rules={{ 
+                            required: 'This field is required.',
+                            validate: (_, allValues) => {
+                              const arrival = allValues?.journeys?.[index]?.arrivedDate;
+                              const departure = allValues?.journeys?.[index]?.departureDate;
+                            
+                              if (!arrival || !departure) return true;
+                            
+                              return new Date(arrival) > new Date(departure) || 'Arrival time must be greater then departure time.';
+                            }
+                            
+                          }}
+                          control={control}
+                          render={({ field }) => (
+                            <AppReactDatepicker
+                              selected={field.value} onChange={field.onChange}
+                              showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
+                              placeholderText="YYYY/MM/DD HH:mm"
+                              maxDate={new Date()}
+                              customInput={
+                                <CustomTextField
+                                  {...field}
+                                  label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
+                                  fullWidth
+                                  required
+                                  helperText={errors?.journeys?.[index]?.arrivedDate?.message}
+                                  error={Boolean(errors?.journeys?.[index]?.arrivedDate)}
+                                />
+                              }
+                            />
+                          )}
+                        />
+                      </Grid>
+                      {/* <Grid size={{ xs: 12, sm: 3 }}>
+                        <Controller
+                          name={`journeys[${index}].departureTime`}
+                          rules={{
+                            required: 'This field is required.',
+                            validate: (_, allValues) => {
 
-                            if (index === 0) return true; // Skip first item
+                              if (index === 0) return true; // Skip first item
 
-                            const currentFromDate = allValues?.journeys?.[index]?.departureDate;
-                            const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
+                              const currentFromDate = allValues?.journeys?.[index]?.departureDate;
+                              const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
 
-                            const prevArrivedDate = allValues?.journeys?.[index - 1]?.arrivedDate;
-                            const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
+                              const prevArrivedDate = allValues?.journeys?.[index - 1]?.arrivedDate;
+                              const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
 
-                            if (!currentFromDate || !currentLeftTime || !prevArrivedDate || !prevArrivedTime) return true;
+                              if (!currentFromDate || !currentLeftTime || !prevArrivedDate || !prevArrivedTime) return true;
 
-                            const currentDeparture = new Date(currentFromDate);
-                            const currentTime = new Date(currentLeftTime);
-                            currentDeparture.setHours(currentTime.getHours(), currentTime.getMinutes());
+                              const currentDeparture = new Date(currentFromDate);
+                              const currentTime = new Date(currentLeftTime);
+                              currentDeparture.setHours(currentTime.getHours(), currentTime.getMinutes());
 
-                            const previousArrival = new Date(prevArrivedDate);
-                            const prevTime = new Date(prevArrivedTime);
-                            previousArrival.setHours(prevTime.getHours(), prevTime.getMinutes());
+                              const previousArrival = new Date(prevArrivedDate);
+                              const prevTime = new Date(prevArrivedTime);
+                              previousArrival.setHours(prevTime.getHours(), prevTime.getMinutes());
 
-                            return currentDeparture > previousArrival || 'Departure Time must be greater then previous Arrival Time.';
-                          }
-                        }}
-                        control={control}
-                        render={({ field }) => (
-                          <AppReactDatepicker
+                              return currentDeparture > previousArrival || 'Departure Time must be greater then previous Arrival Time.';
+                            }
+                          }}
+                          control={control}
+                          render={({ field }) => (
+                            <AppReactDatepicker
+                              selected={field.value} onChange={field.onChange}
+                              showTimeSelect
+                              timeIntervals={5}
+                              showTimeSelectOnly
+                              dateFormat='h:mm aa'
+                              placeholderText="h:mm aa"
+                              customInput={
+                                <TextField
+                                  {...field}
+                                  label={<>Departure Time {<span className='text-error'>*</span> }</>}
+                                  fullWidth
+                                  required
+                                />
+                              }
+                            />
+                          )}
+                        />
+                      </Grid> */}
+                      {/* <Grid size={{ xs: 12, sm: 3 }}>
+                        <Controller
+                          name={`journeys[${index}].arrivedTime`}
+                          control={control}
+                          render={({ field }) => (
+                            <AppReactDatepicker
                             selected={field.value} onChange={field.onChange}
                             showTimeSelect
                             timeIntervals={5}
@@ -457,72 +512,26 @@ const FormTravelingAllowanceAdd = () => {
                             customInput={
                               <TextField
                                 {...field}
-                                label={<>Departure Time {<span className='text-error'>*</span> }</>}
+                                label={<>Arrived Time {<span className='text-error'>*</span> }</>}
                                 fullWidth
                                 required
                               />
                             }
                           />
-                        )}
-                      />
-                    </Grid> */}
-                    <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                        name={`journeys[${index}].arrivedDate`}
-                        rules={{ required: 'This field is required.' }}
-                        control={control}
-                        render={({ field }) => (
-                          <AppReactDatepicker
-                            selected={field.value} onChange={field.onChange}
-                            showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
-                            placeholderText="YYYY/MM/DD HH:mm"
-                            maxDate={new Date()}
-                            customInput={
-                              <CustomTextField
-                                {...field}
-                                label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
-                                fullWidth
-                                required
-                              />
-                            }
-                          />
-                        )}
-                      />
-                    </Grid>
-                    {/* <Grid size={{ xs: 12, sm: 3 }}>
-                      <Controller
-                        name={`journeys[${index}].arrivedTime`}
-                        control={control}
-                        render={({ field }) => (
-                          <AppReactDatepicker
-                          selected={field.value} onChange={field.onChange}
-                          showTimeSelect
-                          timeIntervals={5}
-                          showTimeSelectOnly
-                          dateFormat='h:mm aa'
-                          placeholderText="h:mm aa"
-                          customInput={
-                            <TextField
-                              {...field}
-                              label={<>Arrived Time {<span className='text-error'>*</span> }</>}
-                              fullWidth
-                              required
-                            />
-                          }
+                          )}
                         />
-                        )}
-                      />
-                    </Grid> */}
-                  </Grid>
-                  {index !== 0 && (
-                    <div className='flex flex-col justify-start border-is'>
-                      <IconButton size='small' color='error' onClick={() => remove(index)}>
-                        <i className='tabler-x text-2xl' />
-                      </IconButton>
-                    </div>
-                  )}
-                </div>
-              ))}
+                      </Grid> */}
+                    </Grid>
+                    {index !== 0 && (
+                      <div className='flex flex-col justify-start border-is'>
+                        <IconButton size='small' color='error' onClick={() => remove(index)}>
+                          <i className='tabler-x text-2xl' />
+                        </IconButton>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Button
