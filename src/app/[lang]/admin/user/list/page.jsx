@@ -2,7 +2,7 @@
 import UserList from '@views/apps/user/list'
 
 // Data Imports
-import { getUserData, getUserDataL } from '@/app/server/actions'
+// import { getUserData, getUserDataL } from '@/app/server/actions'
 import { getCookie } from '@/utils/cookies'
 
 /**
@@ -11,25 +11,33 @@ import { getCookie } from '@/utils/cookies'
  * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
  * ! because we've used the server action for getting our static data.
  */
-/* const getUserData = async () => {
+const getUserData = async () => {
   // Vars
-  const res = await fetch(`${process.env.API_URL}/apps/user-list`)
+  try {
+    const token = await getCookie('token');
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch userData')
+    const res = await fetch(`${process.env.API_URL}/admin/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.value}`
+      }
+    })
+
+    const users = await res.json();
+
+    return users;
+
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return [];
   }
+}
 
-  return res.json()
-} */
 const UserListApp = async () => {
 
-  const token = await getCookie('token');
-
-  // // Vars
-  // const data = await getUserData()
-
-  const userData = await getUserDataL(token.value)
-
+  // Vars
+  const userData = await getUserData()
 
   return <UserList userData={userData} />
 }

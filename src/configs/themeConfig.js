@@ -16,7 +16,7 @@
  * Another way is to clear the cookie from the browser's Application/Storage tab and then reload the page.
  */
 const themeConfig = {
-  templateName: 'Vuexy',
+  templateName: 'TTE Portal',
   homePageUrl: '/dashboards/crm',
   settingsCookieName: 'vuexy-mui-next-demo-1',
   mode: 'system', // 'system', 'light', 'dark'
@@ -27,15 +27,15 @@ const themeConfig = {
   compactContentWidth: 1440, // in px
   navbar: {
     type: 'fixed', // 'fixed', 'static'
-    contentWidth: 'compact', // 'compact', 'wide'
+    contentWidth: 'wide', // 'compact', 'wide'
     floating: true, //! true, false (This will not work in the Horizontal Layout)
     detached: true, //! true, false (This will not work in the Horizontal Layout or floating navbar is enabled)
     blur: true // true, false
   },
-  contentWidth: 'compact', // 'compact', 'wide'
+  contentWidth: 'wide', // 'compact', 'wide'
   footer: {
     type: 'static', // 'fixed', 'static'
-    contentWidth: 'compact', // 'compact', 'wide'
+    contentWidth: 'wide', // 'compact', 'wide'
     detached: true //! true, false (This will not work in the Horizontal Layout)
   },
   disableRipple: false, // true, false

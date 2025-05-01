@@ -2,7 +2,7 @@
 import Grid from '@mui/material/Grid2'
 
 // Component Imports
-import FormTravelingAllowanceAdd from '@/views/user/traveling-allowances/add/page'
+import FormTravelingAllowanceAdd from '@/views/user/traveling-allowances/add/FormTravelingAllowanceAdd'
 
 const AddUser = () => {
   return (

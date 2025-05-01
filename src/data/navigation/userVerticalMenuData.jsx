@@ -2,7 +2,7 @@ const userVerticalMenuData = dictionary => [
 
   // This is how you will normally render submenu
   {
-    label: dictionary['navigation'].dashboard,
+    label: 'Dashboard',
     icon: 'tabler-smart-home',
     href: '/dashboard'
   },
@@ -11,14 +11,35 @@ const userVerticalMenuData = dictionary => [
     icon: 'tabler-user',
     children: [
       {
-        label: dictionary['navigation'].list,
+        label: 'List',
         icon: 'tabler-circle',
         href: '/traveling-allowances/list'
       },
       {
-        label: dictionary['navigation'].add,
+        label: 'Add',
         icon: 'tabler-circle',
         href: '/traveling-allowances/add'
+      }
+    ]
+  },
+  {
+    label: 'Reports',
+    icon: 'tabler-report',
+    children: [
+      {
+        label: 'Movement Report (MR)',
+        icon: 'tabler-circle',
+        href: '/reports/movement-report'
+      },
+      {
+        label: 'Night Allowance Journal (NDA)',
+        icon: 'tabler-circle',
+        href: '/reports/night-allowance-journal'
+      },
+      {
+        label: 'Traveling Allowance Journal (TA)',
+        icon: 'tabler-circle',
+        href: '/reports/traveling-allowance-journal'
       }
     ]
   }

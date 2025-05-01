@@ -1,8 +1,7 @@
 // Component Imports
-import UserList from '@views/apps/user/list'
+import TravelAllowanceList from '@/views/user/traveling-allowances/list';
 
 // Data Imports
-// import { getUserData, getUserDataL } from '@/app/server/actions'
 import { getCookie } from '@/utils/cookies'
 
 /**
@@ -11,28 +10,32 @@ import { getCookie } from '@/utils/cookies'
  * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
  * ! because we've used the server action for getting our static data.
  */
-/* const getUserData = async () => {
+const getTravelData = async () => {
   // Vars
-  const res = await fetch(`${process.env.API_URL}/apps/user-list`)
+
+  const token = await getCookie('token');
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token.value}`
+    }
+  });
 
   if (!res.ok) {
     throw new Error('Failed to fetch userData')
   }
 
   return res.json()
-} */
+}
+
 const TravelingAllowancesList = async () => {
 
-  const token = await getCookie('token');
+  // Vars
+  const data = await getTravelData()
 
-  // // Vars
-  // const data = await getUserData()
-
-  // const userData = await getUserDataL(token.value)
-
-
-  // return <UserList userData={userData} />
-  return "Traveling Allowances List";
+  return <TravelAllowanceList allowanceData={data.data} />
 }
 
 export default TravelingAllowancesList
