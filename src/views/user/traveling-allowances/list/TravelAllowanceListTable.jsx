@@ -12,12 +12,13 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 
+import { toast } from 'react-toastify'
+
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { toast } from 'react-toastify'
 
 const TravelAllowanceListTable = ({ tableData }) => {
 

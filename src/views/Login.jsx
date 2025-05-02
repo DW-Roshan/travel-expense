@@ -133,6 +133,7 @@ const Login = ({ mode }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: data.username, password: data.password }),
     });
+
     // const res = await signIn('credentials', {
     //   email: data.email,
     //   password: data.password,
@@ -147,19 +148,22 @@ const Login = ({ mode }) => {
       await setCookie('token', token);
       await setCookie('name', responseData.name);
       await setCookie('email', responseData.email);
+
       // Cookies.set('token', token)
 
       // Store the token in a cookie for future requests
       // setCookie('auth_token', token, 7); // Token expires in 7 days
+
       const userType = responseData.user_type;
+      
       if(userType == 'A'){
         router.replace(getLocalizedUrl('/admin/dashboard', locale));
       } else {
 
         // Vars
         const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
-  
-  
+
+
         router.replace(getLocalizedUrl(redirectURL, locale))
       }
 

@@ -35,6 +35,8 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 
+import { toast } from 'react-toastify'
+
 // Component Imports
 import TableFilters from './TableFilters'
 import AddUserDrawer from './AddUserDrawer'
@@ -45,11 +47,11 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
+
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { toast } from 'react-toastify'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -97,7 +99,9 @@ const userRoleObj = {
 
 const userStatusObj = {
   1: 'success',
+
   // pending: 'warning',
+
   0: 'secondary'
 }
 
@@ -176,6 +180,7 @@ const UserListTable = ({ tableData }) => {
           </div>
         )
       }),
+
       // columnHelper.accessor('role', {
       //   header: 'Role',
       //   cell: ({ row }) => (

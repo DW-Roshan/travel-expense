@@ -1,13 +1,16 @@
+import { redirect } from 'next/navigation'
+
 // Third-party Imports
 import { getCookie } from '@/utils/cookies'
 
 // Component Imports
 import AuthRedirect from '@/components/AuthRedirect'
-import { redirect } from 'next/navigation'
+
 import { getLocalizedUrl } from '@/utils/i18n';
 
 export default async function UserGuard({ children, locale }) {
   const session = await getCookie('token');
+  
   const user = await fetch(`${process.env.API_URL}/user`, {
     headers: {
       'Content-Type': 'application/json',
@@ -16,7 +19,7 @@ export default async function UserGuard({ children, locale }) {
   }).then(res => res.json());
 
   if(user.user_type == 'A'){
-    
+
     return redirect(getLocalizedUrl('/admin/dashboard', locale));
   }
 

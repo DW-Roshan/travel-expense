@@ -1,14 +1,14 @@
 // Third-party Imports
 
-const prisma = new PrismaClient()
+// const prisma = new PrismaClient()
 
 export const authOptions = {
 
   // ** Configure one or more authentication providers
   // ** Please refer to https://next-auth.js.org/configuration/options#providers for more `providers` options
   providers: [
-    
-    
+
+
 
     // ** ...add more providers here
   ],

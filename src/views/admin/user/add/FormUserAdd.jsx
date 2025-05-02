@@ -3,6 +3,8 @@
 // React Imports
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 // MUI Imports
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid2'
@@ -16,17 +18,23 @@ import CardActions from '@mui/material/CardActions'
 import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
 
+import { Controller, useForm } from 'react-hook-form'
+
+import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
+
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
+
+
 import { getCookie } from '@/utils/cookies'
+
 import { MenuProps } from '@/configs/customDataConfig'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
+
+
+// import { toast } from 'react-toastify'
 
 
 const defaultValues = {
@@ -105,6 +113,7 @@ const FormUserAdd = () => {
             'Authorization': `Bearer ${token.value}`
           }
         });
+
         const jsonData = await response.json();
 
         // if(response.status === 401) {
@@ -457,6 +466,7 @@ const FormUserAdd = () => {
               ['gPay', 'G Pay', 'number', true]
             ].map(([name, label, type = 'text', required = false]) => {
               const isLimitedField = name === 'gPay' || name === 'payBand';
+
               return (
                 <Grid size={{ xs: 12, sm: 6 }} key={name}>
                   <Controller name={name} control={control}

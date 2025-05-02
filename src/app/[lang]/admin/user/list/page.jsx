@@ -30,6 +30,7 @@ const getUserData = async () => {
 
   } catch (error) {
     console.error('Error fetching user data:', error);
+    
     return [];
   }
 }

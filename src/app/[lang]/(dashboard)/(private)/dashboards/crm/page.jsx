@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+
 // MUI Imports
 import Grid from '@mui/material/Grid2'
 
@@ -16,7 +18,7 @@ import ActivityTimeline from '@views/dashboards/crm/ActivityTimeline'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
-import { redirect } from 'next/navigation'
+
 
 const DashboardCRM = async () => {
   // Vars

@@ -3,6 +3,8 @@
 // React Imports
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 // MUI Imports
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid2'
@@ -14,18 +16,21 @@ import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import IconButton from '@mui/material/IconButton'
 
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+
+import { Chip } from '@mui/material'
+
 // Components Imports
+import classNames from 'classnames'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import { Chip } from '@mui/material'
-import { getCookie } from '@/utils/cookies'
-import { MenuProps } from '@/configs/customDataConfig'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
 
-import classNames from 'classnames'
+import { getCookie } from '@/utils/cookies'
+
+import { MenuProps } from '@/configs/customDataConfig'
 
 const FormTravelingAllowanceAdd = () => {
   // States
@@ -45,6 +50,7 @@ const FormTravelingAllowanceAdd = () => {
             'Authorization': `Bearer ${token.value}`
           }
         });
+
         const jsonData = await response.json();
 
         setData(jsonData);
@@ -135,6 +141,7 @@ const FormTravelingAllowanceAdd = () => {
               {fields.map((item, index) => {
                 const fromStation = watch(`journeys[${index}].fromStation`);
                 const toStation = watch(`journeys[${index}].toStation`);
+
                 return (
                   <div
                     key={index}
@@ -280,25 +287,30 @@ const FormTravelingAllowanceAdd = () => {
 
                           }}
                           control={control}
-                          render={({ field }) => (
-                            <AppReactDatepicker
-                              selected={field.value} onChange={field.onChange}
-                              showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
-                              placeholderText="YYYY/MM/DD HH:mm"
-                              // minDate={}
-                              maxDate={new Date()}
-                              customInput={
-                                <CustomTextField
-                                  {...field}
-                                  label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
-                                  fullWidth
-                                  required
-                                  helperText={errors?.journeys?.[index]?.arrivedDate?.message}
-                                  error={Boolean(errors?.journeys?.[index]?.arrivedDate)}
-                                />
-                              }
-                            />
-                          )}
+                          render={({ field }) => {
+
+                            const departureDate = watch(`journeys[${index}].departureDate`);
+
+                            return (
+                              <AppReactDatepicker
+                                selected={field.value} onChange={field.onChange}
+                                showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
+                                placeholderText="YYYY/MM/DD HH:mm"
+                                minDate={departureDate || undefined}
+                                maxDate={new Date()}
+                                customInput={
+                                  <CustomTextField
+                                    {...field}
+                                    label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
+                                    fullWidth
+                                    required
+                                    helperText={errors?.journeys?.[index]?.arrivedDate?.message}
+                                    error={Boolean(errors?.journeys?.[index]?.arrivedDate)}
+                                  />
+                                }
+                              />
+                            )
+                          }}
                         />
                       </Grid>
                     </Grid>
