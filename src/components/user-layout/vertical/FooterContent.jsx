@@ -24,8 +24,8 @@ const FooterContent = () => {
         <span className='text-textSecondary'>{`© ${new Date().getFullYear()}, Made with `}</span>
         <span>{`❤️`}</span>
         <span className='text-textSecondary'>{` by `}</span>
-        <Link href='https://dreamweaversgroup.com/' target='_blank' className='text-primary uppercase'>
-          Dream Weavers
+        <Link href='#' target='_blank' className='text-primary uppercase'>
+          TTE Portal
         </Link>
       </p>
     </div>

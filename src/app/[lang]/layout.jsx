@@ -25,9 +25,9 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'TTE Portal - Dream Weavers',
+  title: 'TTE Portal',
   description:
-    'Train Traveling Expense portal created by Dream Weavers.'
+    'Train Traveling Expense portal.'
 }
 
 const RootLayout = async props => {
