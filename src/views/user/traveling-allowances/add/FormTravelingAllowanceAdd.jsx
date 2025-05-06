@@ -31,6 +31,7 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import { getCookie } from '@/utils/cookies'
 
 import { MenuProps } from '@/configs/customDataConfig'
+import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 
 const FormTravelingAllowanceAdd = () => {
   // States
@@ -52,6 +53,8 @@ const FormTravelingAllowanceAdd = () => {
         });
 
         const jsonData = await response.json();
+
+        console.log(jsonData.stations);
 
         setData(jsonData);
       } catch (error) {
@@ -87,47 +90,49 @@ const FormTravelingAllowanceAdd = () => {
 
   const onSubmit = async (data) => {
 
-    const token = await getCookie('token');
+    console.log("data:", data)
 
-    if(token){
+    // const token = await getCookie('token');
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
-        },
-        body: JSON.stringify(data)
-      });
+    // if(token){
 
-      const result = await res.json();
+    //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
+    //     method: 'post',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${token.value}`
+    //     },
+    //     body: JSON.stringify(data)
+    //   });
 
-      if(res.ok){
+    //   const result = await res.json();
 
-        sessionStorage.setItem('success', result.message);
+    //   if(res.ok){
 
-        router.push('/traveling-allowances/list');
+    //     sessionStorage.setItem('success', result.message);
 
-        reset();
+    //     router.push('/traveling-allowances/list');
+
+    //     reset();
 
 
-      } else if(res.status == 422) {
+    //   } else if(res.status == 422) {
 
-        // Laravel returns validation errors in the `errors` object
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          setError(field, {
-            type: 'custom',
-            message: messages[0], // Use the first error message for each field
-          });
-        });
+    //     // Laravel returns validation errors in the `errors` object
+    //     Object.entries(result.errors).forEach(([field, messages]) => {
+    //       setError(field, {
+    //         type: 'custom',
+    //         message: messages[0], // Use the first error message for each field
+    //       });
+    //     });
 
-      } else {
-        sessionStorage.setItem('error', result.message);
+    //   } else {
+    //     sessionStorage.setItem('error', result.message);
 
-        router.push('/traveling-allowances/list');
+    //     router.push('/traveling-allowances/list');
 
-      }
-    }
+    //   }
+    // }
   };
 
   return (
@@ -180,6 +185,55 @@ const FormTravelingAllowanceAdd = () => {
                           control={control}
                           rules={{ required: 'This field is required.' }}
                           render={({ field }) => (
+                            <CustomAutocomplete
+                              fullWidth
+                              // value={field.value || null}
+                              // onChange={(_, newValue) => field.onChange(newValue)}
+                              options={data && data?.stations ? data?.stations : []}
+                              getOptionLabel={(option) => option?.station_name || ''} 
+                              renderOption={(props, option) => (
+                                <MenuItem {...props} key={option.id}>
+                                  <div className='w-full flex justify-between gap-1'>
+                                    {option.station_name}
+                                    <Chip label={option.station_code} size='small' variant='tonal' color='success' />
+                                  </div>
+                                </MenuItem>
+                              )}
+                              isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                              value={data?.stations.find((station) => station.id === field.value) || null}
+                              
+                              onChange={(_, newValue) => {
+                                field.onChange(newValue ? newValue.id : null);
+                              }}
+                              // getOptionLabel={( option) => {
+                              //   <li key={option.id}>
+                              //     {option.station_name} ({option.station_code})
+                              //   </li>
+                              // }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  fullWidth
+                                  label={
+                                    <>
+                                      From Station <span className="text-error">*</span>
+                                    </>
+                                  }
+                                  error={Boolean(errors?.journeys?.[index]?.fromStation)}
+                                  helperText={errors?.journeys?.[index]?.fromStation?.message}
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      </Grid>
+
+                      {/* <Grid size={{ xs: 12, sm: 4 }}>
+                        <Controller
+                          name={`journeys[${index}].fromStation`}
+                          control={control}
+                          rules={{ required: 'This field is required.' }}
+                          render={({ field }) => (
                             <CustomTextField
                               select
                               fullWidth
@@ -202,7 +256,7 @@ const FormTravelingAllowanceAdd = () => {
                             </CustomTextField>
                           )}
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid size={{ xs: 12, sm: 4 }}>
                         <Controller
                           name={`journeys[${index}].toStation`}
