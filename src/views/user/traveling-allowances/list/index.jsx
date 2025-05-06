@@ -4,11 +4,11 @@ import Grid from '@mui/material/Grid2'
 // Component Imports
 import TravelAllowanceListTable from './TravelAllowanceListTable'
 
-const TravelAllowanceList = ({ allowanceData }) => {
+const TravelAllowanceList = () => {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <TravelAllowanceListTable tableData={allowanceData} />
+        <TravelAllowanceListTable />
       </Grid>
     </Grid>
   )

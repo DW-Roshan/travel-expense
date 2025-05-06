@@ -51,6 +51,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { getCookie } from '@/utils/cookies'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -107,16 +108,48 @@ const userStatusObj = {
 // Column Definitions
 const columnHelper = createColumnHelper()
 
-const UserListTable = ({ tableData }) => {
+const UserListTable = () => {
   // States
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[tableData])
+  const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
   const { lang: locale } = useParams()
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      const token = await getCookie('token');
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.value}`
+          }
+        });
+
+        const jsonData = await response.json();
+
+        console.log('jsonData', jsonData);
+
+        // if(response.status === 401) {
+        //   router.push('/not-authorized');
+        // }
+
+        setData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData(null);
+      }
+    };
+
+    fetchData();
+
+  }, []);
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts

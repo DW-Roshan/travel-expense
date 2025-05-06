@@ -33,9 +33,9 @@ const getTravelData = async () => {
 const TravelingAllowancesList = async () => {
 
   // Vars
-  const data = await getTravelData()
+  // const data = await getTravelData()
 
-  return <TravelAllowanceList allowanceData={data.data} />
+  return <TravelAllowanceList />
 }
 
 export default TravelingAllowancesList
