@@ -93,7 +93,7 @@ const UserDropdown = () => {
       if(token){
 
         console.log(token.value);
-        
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
           method: 'POST',
           headers: {
@@ -104,6 +104,10 @@ const UserDropdown = () => {
 
         if(res.ok){
           deleteCookie(token);
+
+          router.push(getLocalizedUrl('/login', locale));
+
+          location.href = getLocalizedUrl('/login', locale);
         }
       }
 

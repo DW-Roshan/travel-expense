@@ -54,8 +54,6 @@ const FormTravelingAllowanceAdd = () => {
 
         const jsonData = await response.json();
 
-        console.log(jsonData.stations);
-
         setData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -90,49 +88,47 @@ const FormTravelingAllowanceAdd = () => {
 
   const onSubmit = async (data) => {
 
-    console.log("data:", data)
+    const token = await getCookie('token');
 
-    // const token = await getCookie('token');
+    if(token){
 
-    // if(token){
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token.value}`
+        },
+        body: JSON.stringify(data)
+      });
 
-    //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
-    //     method: 'post',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': `Bearer ${token.value}`
-    //     },
-    //     body: JSON.stringify(data)
-    //   });
+      const result = await res.json();
 
-    //   const result = await res.json();
+      if(res.ok){
 
-    //   if(res.ok){
+        sessionStorage.setItem('success', result.message);
 
-    //     sessionStorage.setItem('success', result.message);
+        router.push('/traveling-allowances/list');
 
-    //     router.push('/traveling-allowances/list');
-
-    //     reset();
+        reset();
 
 
-    //   } else if(res.status == 422) {
+      } else if(res.status == 422) {
 
-    //     // Laravel returns validation errors in the `errors` object
-    //     Object.entries(result.errors).forEach(([field, messages]) => {
-    //       setError(field, {
-    //         type: 'custom',
-    //         message: messages[0], // Use the first error message for each field
-    //       });
-    //     });
+        // Laravel returns validation errors in the `errors` object
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          setError(field, {
+            type: 'custom',
+            message: messages[0], // Use the first error message for each field
+          });
+        });
 
-    //   } else {
-    //     sessionStorage.setItem('error', result.message);
+      } else {
+        sessionStorage.setItem('error', result.message);
 
-    //     router.push('/traveling-allowances/list');
+        router.push('/traveling-allowances/list');
 
-    //   }
-    // }
+      }
+    }
   };
 
   return (
@@ -187,10 +183,8 @@ const FormTravelingAllowanceAdd = () => {
                           render={({ field }) => (
                             <CustomAutocomplete
                               fullWidth
-                              // value={field.value || null}
-                              // onChange={(_, newValue) => field.onChange(newValue)}
-                              options={data && data?.stations ? data?.stations : []}
-                              getOptionLabel={(option) => option?.station_name || ''} 
+                              options={data && data?.stations ? data?.stations.filter((station) => station.id !== toStation) : []}
+                              getOptionLabel={(option) => option?.station_name || ''}
                               renderOption={(props, option) => (
                                 <MenuItem {...props} key={option.id}>
                                   <div className='w-full flex justify-between gap-1'>
@@ -201,15 +195,9 @@ const FormTravelingAllowanceAdd = () => {
                               )}
                               isOptionEqualToValue={(option, value) => option?.id === value?.id}
                               value={data?.stations.find((station) => station.id === field.value) || null}
-                              
                               onChange={(_, newValue) => {
                                 field.onChange(newValue ? newValue.id : null);
                               }}
-                              // getOptionLabel={( option) => {
-                              //   <li key={option.id}>
-                              //     {option.station_name} ({option.station_code})
-                              //   </li>
-                              // }}
                               renderInput={(params) => (
                                 <CustomTextField
                                   {...params}
@@ -221,6 +209,46 @@ const FormTravelingAllowanceAdd = () => {
                                   }
                                   error={Boolean(errors?.journeys?.[index]?.fromStation)}
                                   helperText={errors?.journeys?.[index]?.fromStation?.message}
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Controller
+                          name={`journeys[${index}].toStation`}
+                          control={control}
+                          rules={{ required: 'This field is required.' }}
+                          render={({ field }) => (
+                            <CustomAutocomplete
+                              fullWidth
+                              options={data && data?.stations ? data?.stations.filter((station) => station.id !== fromStation) : []}
+                              getOptionLabel={(option) => option?.station_name || ''}
+                              renderOption={(props, option) => (
+                                <MenuItem {...props} key={option.id}>
+                                  <div className='w-full flex justify-between gap-1'>
+                                    {option.station_name}
+                                    <Chip label={option.station_code} size='small' variant='tonal' color='success' />
+                                  </div>
+                                </MenuItem>
+                              )}
+                              isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                              value={data?.stations.find((station) => station.id === field.value) || null}
+                              onChange={(_, newValue) => {
+                                field.onChange(newValue ? newValue.id : null);
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  fullWidth
+                                  label={
+                                    <>
+                                      To Station <span className="text-error">*</span>
+                                    </>
+                                  }
+                                  error={Boolean(errors?.journeys?.[index]?.toStation)}
+                                  helperText={errors?.journeys?.[index]?.toStation?.message}
                                 />
                               )}
                             />

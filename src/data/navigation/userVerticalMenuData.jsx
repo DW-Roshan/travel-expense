@@ -23,6 +23,11 @@ const userVerticalMenuData = dictionary => [
     ]
   },
   {
+    label: 'Leaves',
+    icon: 'tabler-calendar-time',
+    href: '/leaves'
+  },
+  {
     label: 'Reports',
     icon: 'tabler-report',
     children: [
