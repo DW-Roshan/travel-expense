@@ -338,6 +338,7 @@ const FormTravelingAllowanceAdd = () => {
                               selected={field.value} onChange={field.onChange}
                               showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
                               placeholderText="YYYY/MM/DD HH:mm"
+                              excludeDates={data?.removeDates && data?.removeDates.map(date => new Date(date))}
                               maxDate={new Date()}
                               customInput={
                                 <CustomTextField
@@ -378,6 +379,7 @@ const FormTravelingAllowanceAdd = () => {
                                 selected={field.value} onChange={field.onChange}
                                 showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
                                 placeholderText="YYYY/MM/DD HH:mm"
+                                excludeDates={data?.removeDates && data?.removeDates.map(date => new Date(date))}
                                 minDate={departureDate || undefined}
                                 maxDate={new Date()}
                                 customInput={

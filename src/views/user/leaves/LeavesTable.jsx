@@ -116,6 +116,7 @@ const LeavesTable = () => {
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [removeDates, setRemoveDates] = useState();
 
   // Hooks
   const { lang: locale } = useParams()
@@ -138,10 +139,16 @@ const LeavesTable = () => {
       // if(response.status === 401) {
       //   router.push('/not-authorized');
       // }
+      if(jsonData){
+        
+        if(jsonData.removeDates && jsonData.removeDates.length > 0){
+          setRemoveDates(jsonData.removeDates.map(date => new Date(date)))
+        }
 
-      if(jsonData.leaves.length > 0){
+        if(jsonData.leaves.length > 0){
 
-        setData(jsonData.leaves);
+          setData(jsonData.leaves);
+        }
       }
 
     } catch (error) {
@@ -379,6 +386,7 @@ const LeavesTable = () => {
         open={addEditLeaveOpen}
         handleClose={() => {setAddEditLeaveOpen(!addEditLeaveOpen); setEditLeaveData(null);}}
         editLeaveData={editLeaveData}
+        removeDates={removeDates}
         fetchData={fetchData}
       />
     </>

@@ -23,7 +23,7 @@ import { toast } from 'react-toastify'
 
 const AddEditLeaveDrawer = props => {
   // Props
-  const { open, handleClose, editLeaveData, fetchData } = props
+  const { open, handleClose, editLeaveData, removeDates, fetchData } = props
 
   // States
 
@@ -59,7 +59,7 @@ const AddEditLeaveDrawer = props => {
 
     try {
 
-      if(editLeaveData.id){
+      if(editLeaveData && editLeaveData.id){
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves/${editLeaveData.id}`, {
           method: 'put',
@@ -203,6 +203,7 @@ const AddEditLeaveDrawer = props => {
                 selected={field.value} onChange={field.onChange}
                 showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
                 placeholderText="YYYY/MM/DD"
+                excludeDates={removeDates}
                 maxDate={new Date()}
                 customInput={
                   <CustomTextField
@@ -228,6 +229,7 @@ const AddEditLeaveDrawer = props => {
                 selected={field.value} onChange={field.onChange}
                 showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
                 placeholderText="YYYY/MM/DD"
+                excludeDates={removeDates}
                 maxDate={new Date()}
                 customInput={
                   <CustomTextField
