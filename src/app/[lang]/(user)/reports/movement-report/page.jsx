@@ -1,6 +1,7 @@
+import MovementReport from "@/views/user/reports/MovementReport"
 
 const Reports = () => {
-  return "Movement Report"
+  return <MovementReport />
 }
 
 export default Reports

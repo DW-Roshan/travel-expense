@@ -54,6 +54,8 @@ const FormTravelingAllowanceAdd = () => {
 
         const jsonData = await response.json();
 
+        console.log(jsonData);
+
         setData(jsonData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -285,7 +287,7 @@ const FormTravelingAllowanceAdd = () => {
                           )}
                         />
                       </Grid> */}
-                      <Grid size={{ xs: 12, sm: 4 }}>
+                      {/* <Grid size={{ xs: 12, sm: 4 }}>
                         <Controller
                           name={`journeys[${index}].toStation`}
                           control={control}
@@ -313,7 +315,7 @@ const FormTravelingAllowanceAdd = () => {
                             </CustomTextField>
                           )}
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid size={{ xs: 12, sm: 3 }}>
                         <Controller name={`journeys[${index}].departureDate`} control={control}
                           rules={{
