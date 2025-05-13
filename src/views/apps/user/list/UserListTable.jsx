@@ -52,6 +52,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
 import { getCookie } from '@/utils/cookies'
+import { useSession } from 'next-auth/react'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -118,17 +119,21 @@ const UserListTable = () => {
 
   // Hooks
   const { lang: locale } = useParams()
+  const { data: session } = useSession()
+  const token = session?.user?.token
 
   useEffect(() => {
 
     const fetchData = async () => {
-      const token = await getCookie('token');
+      // const token = await getCookie('token');
+
+      if(!token) return
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -149,7 +154,7 @@ const UserListTable = () => {
 
     fetchData();
 
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts

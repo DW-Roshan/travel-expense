@@ -18,6 +18,7 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 import { getCookie } from '@/utils/cookies'
 import { toast } from 'react-toastify'
+import { useSession } from 'next-auth/react'
 
 // Vars
 
@@ -26,6 +27,8 @@ const AddEditLeaveDrawer = props => {
   const { open, handleClose, editLeaveData, removeDates, fetchData } = props
 
   // States
+  const {data: session} = useSession()
+  const token = session?.user?.token;
 
   // Hooks
   const {
@@ -55,93 +58,96 @@ const AddEditLeaveDrawer = props => {
 
   const onSubmit = async (data) => {
 
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
-    try {
+    if(token){
 
-      if(editLeaveData && editLeaveData.id){
+      try {
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves/${editLeaveData.id}`, {
-          method: 'put',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
-          },
-          body: JSON.stringify({
-            leavePurpose: data.leavePurpose,
-            fromDate: new Date(data.fromDate).toISOString(),
-            toDate: new Date(data.toDate).toISOString()
+        if(editLeaveData && editLeaveData.id){
+
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves/${editLeaveData.id}`, {
+            method: 'put',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              leavePurpose: data.leavePurpose,
+              fromDate: new Date(data.fromDate).toISOString(),
+              toDate: new Date(data.toDate).toISOString()
+            })
           })
-        })
 
-        const result = await response.json();
+          const result = await response.json();
 
-        if( response.status === 200 ){
+          if( response.status === 200 ){
 
-          toast.success('Leave updated successfully.')
+            toast.success('Leave updated successfully.')
 
-          fetchData()
-        } else if(response.status == 422) {
+            fetchData()
+          } else if(response.status == 422) {
 
-          // Laravel returns validation errors in the `errors` object
-          Object.entries(result.errors).forEach(([field, messages]) => {
-            setError(field, {
-              type: 'custom',
-              message: messages[0], // Use the first error message for each field
+            // Laravel returns validation errors in the `errors` object
+            Object.entries(result.errors).forEach(([field, messages]) => {
+              setError(field, {
+                type: 'custom',
+                message: messages[0], // Use the first error message for each field
+              });
             });
-          });
 
-          return;
+            return;
+
+          } else {
+            toast.error(result.message);
+          }
 
         } else {
-          toast.error(result.message);
-        }
 
-      } else {
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves/store`, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
-          },
-          body: JSON.stringify({
-            leavePurpose: data.leavePurpose,
-            fromDate: new Date(data.fromDate).toISOString(),
-            toDate: new Date(data.toDate).toISOString()
-          })
-        });
-
-        const result = await response.json();
-
-        if( response.status === 200 ){
-
-          toast.success('Leave added successfully.')
-
-          fetchData()
-        } else if(response.status == 422) {
-
-          // Laravel returns validation errors in the `errors` object
-          Object.entries(result.errors).forEach(([field, messages]) => {
-            setError(field, {
-              type: 'custom',
-              message: messages[0], // Use the first error message for each field
-            });
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves/store`, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              leavePurpose: data.leavePurpose,
+              fromDate: new Date(data.fromDate).toISOString(),
+              toDate: new Date(data.toDate).toISOString()
+            })
           });
 
-          return;
+          const result = await response.json();
 
-        } else {
-          toast.error(result.message);
+          if( response.status === 200 ){
+
+            toast.success('Leave added successfully.')
+
+            fetchData()
+          } else if(response.status == 422) {
+
+            // Laravel returns validation errors in the `errors` object
+            Object.entries(result.errors).forEach(([field, messages]) => {
+              setError(field, {
+                type: 'custom',
+                message: messages[0], // Use the first error message for each field
+              });
+            });
+
+            return;
+
+          } else {
+            toast.error(result.message);
+          }
+
         }
+
+      } catch (error) {
+        console.error('Error submitting form:', error);
+
+        toast.error('An error occurred while submitting the form. Please try again later.');
 
       }
-
-    } catch (error) {
-      console.error('Error submitting form:', error);
-
-      toast.error('An error occurred while submitting the form. Please try again later.');
-
     }
 
     handleClose()

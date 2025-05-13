@@ -29,6 +29,7 @@ import { useSettings } from '@core/hooks/useSettings'
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
 import { deleteCookie, getCookie } from '@/utils/cookies'
+import { useSession } from 'next-auth/react'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -51,7 +52,7 @@ const UserDropdown = () => {
 
   // Hooks
   const router = useRouter()
-  const { data: session } = []
+  const { data: session } = useSession();
   const { settings } = useSettings()
   const { lang: locale } = useParams()
 
@@ -59,17 +60,17 @@ const UserDropdown = () => {
     !open ? setOpen(true) : setOpen(false)
   }
 
-  useEffect(() => {
-    const fetchCookies = async () => {
-      const nameValue = await getCookie('name');
-      const emailValue = await getCookie('email');
+  // useEffect(() => {
+  //   const fetchCookies = async () => {
+  //     const nameValue = await getCookie('name');
+  //     const emailValue = await getCookie('email');
 
-      setName(nameValue.value);
-      setEmail(emailValue.value);
-    };
+  //     setName(nameValue.value);
+  //     setEmail(emailValue.value);
+  //   };
 
-    fetchCookies(); // Call the async function
-  }, []);
+  //   fetchCookies(); // Call the async function
+  // }, []);
 
   const handleDropdownClose = (event, url) => {
     if (url) {
@@ -85,31 +86,21 @@ const UserDropdown = () => {
 
   const handleUserLogout = async () => {
     try {
+
       // Sign out from the app
-      // await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      if(session.user.token){
 
-      const token = await getCookie('token');
-
-      if(token){
-
-        console.log(token.value);
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`, // Pass the current token if it's in cookies
+            'Authorization': `Bearer ${session.user.token}`, // Pass the current token if it's in cookies
           },
         });
 
-        if(res.ok){
-          deleteCookie(token);
-
-          router.push(getLocalizedUrl('/login', locale));
-
-          location.href = getLocalizedUrl('/login', locale);
-        }
       }
+
+      await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
 
     } catch (error) {
       console.error(error)
@@ -155,12 +146,12 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt={name || ''} src={session?.user?.image || ''} />
+                    <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        {name || ''}
+                        {session?.user?.name || ''}
                       </Typography>
-                      <Typography variant='caption'>{email || ''}</Typography>
+                      <Typography variant='caption'>{session?.user?.email || ''}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />

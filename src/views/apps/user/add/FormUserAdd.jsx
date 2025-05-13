@@ -32,6 +32,7 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import { getCookie } from '@/utils/cookies'
 
 import { MenuProps } from '@/configs/customDataConfig'
+import { useSession } from 'next-auth/react'
 
 
 // import { toast } from 'react-toastify'
@@ -95,6 +96,9 @@ const FormUserAdd = () => {
     phoneNumber: ''
   })
 
+  const { data: session } = useSession()
+  const token = session?.user?.token
+
   const [data, setData] = useState();
 
   const [showPassword, setShowPassword] = useState(false)
@@ -105,13 +109,15 @@ const FormUserAdd = () => {
   useEffect(() => {
 
     const fetchData = async () => {
-      const token = await getCookie('token');
+      // const token = await getCookie('token');
+
+      if(!token) return
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/add`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -130,7 +136,7 @@ const FormUserAdd = () => {
 
     fetchData();
 
-  }, []);
+  }, [token]);
 
   const handleClickShowPassword = () => setFormData(show => ({ ...show, isPasswordShown: !show.isPasswordShown }))
 
@@ -181,7 +187,7 @@ const FormUserAdd = () => {
 
   const onSubmit = async (data) => {
 
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
     if(token){
 
@@ -189,7 +195,7 @@ const FormUserAdd = () => {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       });

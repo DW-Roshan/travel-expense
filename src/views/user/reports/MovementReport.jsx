@@ -28,22 +28,28 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { useSession } from 'next-auth/react'
 
 const MovementReport = () => {
+
+  const { data: session } = useSession()
+  const token = session?.user?.token
 
   const [data, setData] = useState([]);
   const [month, setMonth] = useState(new Date())
   const tableRef = useRef(null);
 
   const fetchData = async (date) => {
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
+
+    if(!token) return
 
     try {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movement-reports${date ? `?month=${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}` : ''}`, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -75,7 +81,7 @@ const MovementReport = () => {
 
     fetchData();
 
-  }, [])
+  }, [token])
 
   const handleMonthChange = async (date) => {
 

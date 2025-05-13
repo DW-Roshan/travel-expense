@@ -21,23 +21,29 @@ import { getLocalizedUrl } from '@/utils/i18n'
 import tableStyles from '@core/styles/table.module.css'
 
 import { getCookie } from '@/utils/cookies'
+import { useSession } from 'next-auth/react'
 
 const TravelAllowanceListTable = () => {
 
   // Hooks
   const { lang: locale } = useParams()
+  const { data: session } = useSession()
   const [data, setData] = useState([]);
+
+  const token = session?.user?.token
 
   useEffect(() => {
 
     const fetchData = async () => {
-      const token = await getCookie('token');
+      // const token = await getCookie('token');
+
+      if(!token) return
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -58,7 +64,7 @@ const TravelAllowanceListTable = () => {
 
     fetchData();
 
-  }, [])
+  }, [token])
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts

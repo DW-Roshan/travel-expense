@@ -128,44 +128,44 @@ const Login = ({ mode }) => {
   // };
 
   const onSubmit = async data => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: data.username, password: data.password }),
-    });
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ username: data.username, password: data.password }),
+    // });
 
-    // const res = await signIn('credentials', {
-    //   email: data.email,
-    //   password: data.password,
-    //   redirect: false
-    // })
+    const res = await signIn('credentials', {
+      username: data.username,
+      password: data.password,
+      redirect: false
+    })
 
     if (res && res.ok) {
 
-      const responseData = await res.json();
-      const token = responseData.token; // assuming the token is returned in the response
+      // const responseData = await res.json();
+      // const token = responseData.token; // assuming the token is returned in the response
 
-      await setCookie('token', token);
-      await setCookie('name', responseData.name);
-      await setCookie('email', responseData.email);
+      // await setCookie('token', token);
+      // await setCookie('name', responseData.name);
+      // await setCookie('email', responseData.email);
 
       // Cookies.set('token', token)
 
       // Store the token in a cookie for future requests
       // setCookie('auth_token', token, 7); // Token expires in 7 days
 
-      const userType = responseData.user_type;
+      // const userType = responseData.user_type;
       
-      if(userType == 'A'){
-        router.replace(getLocalizedUrl('/admin/dashboard', locale));
-      } else {
+      // if(userType == 'A'){
+      //   router.replace(getLocalizedUrl('/admin/dashboard', locale));
+      // } else {
 
         // Vars
         const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
 
 
         router.replace(getLocalizedUrl(redirectURL, locale))
-      }
+      // }
 
     } else {
 

@@ -32,23 +32,29 @@ import { getCookie } from '@/utils/cookies'
 
 import { MenuProps } from '@/configs/customDataConfig'
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
+import { useSession } from 'next-auth/react'
 
 const FormTravelingAllowanceAdd = () => {
   // States
   const [data, setData] = useState();
+
+  const { data: session } = useSession()
+  const token = session?.user?.token
 
   const router = useRouter();
 
   useEffect(() => {
 
     const fetchData = async () => {
-      const token = await getCookie('token');
+      // const token = await getCookie('token');
+
+      if(!token) return
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/add`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -65,7 +71,7 @@ const FormTravelingAllowanceAdd = () => {
 
     fetchData();
 
-  }, []);
+  }, [token]);
 
   const { control, handleSubmit, watch, reset, formState: { errors } } = useForm({
     defaultValues: {
@@ -90,7 +96,7 @@ const FormTravelingAllowanceAdd = () => {
 
   const onSubmit = async (data) => {
 
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
     if(token){
 
@@ -98,7 +104,7 @@ const FormTravelingAllowanceAdd = () => {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
       });

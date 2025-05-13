@@ -1,3 +1,7 @@
+import { getServerSession } from 'next-auth';
+
+import { authOptions } from '@/libs/auth';
+
 import { redirect } from 'next/navigation'
 
 // Third-party Imports
@@ -9,28 +13,12 @@ import AuthRedirect from '@/components/AuthRedirect'
 import { getLocalizedUrl } from '@/utils/i18n';
 
 export default async function AdminGuard({ children, locale }) {
-  const session = await getCookie('token');
+  const session = await getServerSession(authOptions)
+  const userType = session.user.userType;
 
-  const user = await fetch(`${process.env.API_URL}/user`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.value}`
-    }
-  }).then(res => res.json());
+  // console.log('session', session);
 
-  if(user.user_type == 'U'){
-
-    return redirect(getLocalizedUrl('/dashboard', locale));
-  }
-
-  const isAdmin = await fetch(`${process.env.API_URL}/admin/session`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.value}`
-    }
-  });
-
-  if(isAdmin.status === 401) {
+  if(userType !== 'A') {
     redirect(`/not-authorized`);
   }
 

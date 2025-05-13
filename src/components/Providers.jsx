@@ -22,7 +22,7 @@ const Providers = async props => {
 
   return (
     
-    // <NextAuthProvider basePath={process.env.NEXTAUTH_BASEPATH}>
+    <NextAuthProvider basePath={process.env.NEXTAUTH_BASEPATH}>
 
       <VerticalNavProvider>
         <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
@@ -33,7 +33,7 @@ const Providers = async props => {
         </SettingsProvider>
       </VerticalNavProvider>
 
-    // </NextAuthProvider>
+    </NextAuthProvider>
   )
 }
 

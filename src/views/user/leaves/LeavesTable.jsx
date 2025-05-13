@@ -52,6 +52,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
 import { getCookie } from '@/utils/cookies'
+import { useSession } from 'next-auth/react'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -121,39 +122,45 @@ const LeavesTable = () => {
   // Hooks
   const { lang: locale } = useParams()
 
+  const {data: session} = useSession();
+  const token = session?.user?.token;
+
   const fetchData = async () => {
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
+    if(token){
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaves`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const jsonData = await response.json();
+
+        console.log('jsonData', jsonData);
+
+        // if(response.status === 401) {
+        //   router.push('/not-authorized');
+        // }
+        if(jsonData){
+          
+          if(jsonData.removeDates && jsonData.removeDates.length > 0){
+            setRemoveDates(jsonData.removeDates.map(date => new Date(date)))
+          }
+
+          if(jsonData.leaves.length > 0){
+
+            setData(jsonData.leaves);
+          }
         }
-      });
 
-      const jsonData = await response.json();
-
-      console.log('jsonData', jsonData);
-
-      // if(response.status === 401) {
-      //   router.push('/not-authorized');
-      // }
-      if(jsonData){
-        
-        if(jsonData.removeDates && jsonData.removeDates.length > 0){
-          setRemoveDates(jsonData.removeDates.map(date => new Date(date)))
-        }
-
-        if(jsonData.leaves.length > 0){
-
-          setData(jsonData.leaves);
-        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData(null);
       }
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setData(null);
     }
   };
 
@@ -163,7 +170,7 @@ const LeavesTable = () => {
 
     fetchData();
 
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts

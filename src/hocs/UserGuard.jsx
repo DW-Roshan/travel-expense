@@ -1,3 +1,7 @@
+import { getServerSession } from 'next-auth';
+
+import { authOptions } from '@/libs/auth';
+
 import { redirect } from 'next/navigation'
 
 // Third-party Imports
@@ -9,29 +13,13 @@ import AuthRedirect from '@/components/AuthRedirect'
 import { getLocalizedUrl } from '@/utils/i18n';
 
 export default async function UserGuard({ children, locale }) {
-  const session = await getCookie('token');
-  
-  const user = await fetch(`${process.env.API_URL}/user`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.value}`
-    }
-  }).then(res => res.json());
+  const session = await getServerSession(authOptions)
+  const userType = session.user.userType;
 
-  if(user.user_type == 'A'){
-
-    return redirect(getLocalizedUrl('/admin/dashboard', locale));
-  }
-
-  const isUser = await fetch(`${process.env.API_URL}/session`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.value}`
-    }
-  });
-
-  if(isUser.status === 401) {
-    redirect(`/not-authorized`);
+  if(userType === 'A') {
+    redirect(getLocalizedUrl(`/admin/dashboard`, locale));
+  } else if(userType !== 'U') {
+    redirect(getLocalizedUrl(`/not-authorized`, locale));
   }
 
   return <>{session ? children : <AuthRedirect lang={locale} />}</>

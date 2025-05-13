@@ -4,6 +4,7 @@ import UserList from '@views/apps/user/list'
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
 import { getCookie } from '@/utils/cookies'
+import { getServerSession } from 'next-auth';
 
 /**
  * ! If you need data using an API call, uncomment the below API code, update the `process.env.API_URL` variable in the
@@ -11,10 +12,14 @@ import { getCookie } from '@/utils/cookies'
  * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
  * ! because we've used the server action for getting our static data.
  */
+
 const getUserData = async () => {
+  const session = await getServerSession();
+  const token = session?.user?.token
+  if(!token) return
   // Vars
   try {
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // Timeout after 15 seconds
@@ -24,7 +29,7 @@ const getUserData = async () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token.value}`
+        'Authorization': `Bearer ${token}`
       }
     })
 
