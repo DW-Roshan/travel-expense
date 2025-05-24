@@ -37,6 +37,8 @@ import {
 
 import { toast } from 'react-toastify'
 
+import { useSession } from 'next-auth/react'
+
 // Component Imports
 import TableFilters from './TableFilters'
 import AddUserDrawer from './AddUserDrawer'
@@ -51,8 +53,6 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { getCookie } from '@/utils/cookies'
-import { useSession } from 'next-auth/react'
 
 // Styled Components
 const Icon = styled('i')({})

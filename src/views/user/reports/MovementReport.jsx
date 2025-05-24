@@ -17,18 +17,18 @@ import { toast } from 'react-toastify'
 // Util Imports
 // import { getLocalizedUrl } from '@/utils/i18n'
 
-// Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import { useSession } from 'next-auth/react'
 
-import { getCookie } from '@/utils/cookies'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 import { CardContent } from '@mui/material'
 
+// Style Imports
+import tableStyles from '@core/styles/table.module.css'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
-import { useSession } from 'next-auth/react'
 
 const MovementReport = () => {
 

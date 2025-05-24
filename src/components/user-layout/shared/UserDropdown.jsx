@@ -154,7 +154,7 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/user-profile')}>
+                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/change-password')}>
                     <i className='tabler-key' />
                     <Typography color='text.primary'>Change Password</Typography>
                   </MenuItem>

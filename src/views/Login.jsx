@@ -26,6 +26,8 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
 import classnames from 'classnames'
 
+import { CircularProgress } from '@mui/material'
+
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
@@ -78,6 +80,8 @@ const Login = ({ mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [tryCatchError, setTryCatchError] = useState();
 
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
@@ -134,48 +138,38 @@ const Login = ({ mode }) => {
     //   body: JSON.stringify({ username: data.username, password: data.password }),
     // });
 
-    const res = await signIn('credentials', {
-      username: data.username,
-      password: data.password,
-      redirect: false
-    })
+    setLoading(true);
+    setTryCatchError();
 
-    if (res && res.ok) {
+    try {
 
-      // const responseData = await res.json();
-      // const token = responseData.token; // assuming the token is returned in the response
+      const res = await signIn('credentials', {
+        username: data.username,
+        password: data.password,
+        redirect: false
+      })
 
-      // await setCookie('token', token);
-      // await setCookie('name', responseData.name);
-      // await setCookie('email', responseData.email);
-
-      // Cookies.set('token', token)
-
-      // Store the token in a cookie for future requests
-      // setCookie('auth_token', token, 7); // Token expires in 7 days
-
-      // const userType = responseData.user_type;
-      
-      // if(userType == 'A'){
-      //   router.replace(getLocalizedUrl('/admin/dashboard', locale));
-      // } else {
+      if (res && res.ok && res.error === null) {
 
         // Vars
         const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
 
-
         router.replace(getLocalizedUrl(redirectURL, locale))
-      // }
+      } else {
+        if (res?.error) {
+          const error = JSON.parse(res.error)
 
-    } else {
-
-      const errorData = await res.json(); // Parse the error response as JSON
-
-      if (errorData) {
-        // const error = JSON.parse(res.error)
-
-        setErrorState(errorData)
+          setErrorState(error)
+        }
       }
+    } catch (error) {
+
+      console.log("error:", error);
+
+      setTryCatchError('Something went wrong. Server is not working')
+
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -201,12 +195,11 @@ const Login = ({ mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          {/* <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
-            <Typography variant='body2' color='primary.main'>
-              Email: <span className='font-medium'>admin@vuexy.com</span> / Pass:{' '}
-              <span className='font-medium'>admin</span>
-            </Typography>
-          </Alert> */}
+          {tryCatchError && 
+            <Alert severity='error'>
+              {tryCatchError}    
+            </Alert>
+          }
           <form
             noValidate
             autoComplete='off'
@@ -283,7 +276,8 @@ const Login = ({ mode }) => {
                 Forgot password?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
+            <Button fullWidth variant='contained' type='submit' className='gap-2' disabled={loading}>
+              {loading && <CircularProgress size={20} color='inherit' />}
               Login
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>

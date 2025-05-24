@@ -1,10 +1,10 @@
+import { getServerSession } from 'next-auth';
+
 // Component Imports
 import UserList from '@views/apps/user/list'
 
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
-import { getCookie } from '@/utils/cookies'
-import { getServerSession } from 'next-auth';
 
 /**
  * ! If you need data using an API call, uncomment the below API code, update the `process.env.API_URL` variable in the
@@ -16,8 +16,11 @@ import { getServerSession } from 'next-auth';
 const getUserData = async () => {
   const session = await getServerSession();
   const token = session?.user?.token
+  
   if(!token) return
+  
   // Vars
+  
   try {
     // const token = await getCookie('token');
 

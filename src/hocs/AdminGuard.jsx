@@ -1,8 +1,8 @@
+import { redirect } from 'next/navigation'
+
 import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@/libs/auth';
-
-import { redirect } from 'next/navigation'
 
 // Third-party Imports
 import { getCookie } from '@/utils/cookies'

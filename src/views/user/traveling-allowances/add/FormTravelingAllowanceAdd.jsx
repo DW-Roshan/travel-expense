@@ -23,16 +23,16 @@ import { Chip } from '@mui/material'
 // Components Imports
 import classNames from 'classnames'
 
+import { useSession } from 'next-auth/react'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-import { getCookie } from '@/utils/cookies'
-
 import { MenuProps } from '@/configs/customDataConfig'
+
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
-import { useSession } from 'next-auth/react'
 
 const FormTravelingAllowanceAdd = () => {
   // States
@@ -73,7 +73,7 @@ const FormTravelingAllowanceAdd = () => {
 
   }, [token]);
 
-  const { control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, reset, formState: { errors }, setError } = useForm({
     defaultValues: {
       journeys: [
         {
@@ -193,6 +193,17 @@ const FormTravelingAllowanceAdd = () => {
                               fullWidth
                               options={data && data?.stations ? data?.stations.filter((station) => station.id !== toStation) : []}
                               getOptionLabel={(option) => option?.station_name || ''}
+                              filterOptions={(options, state) =>
+                                options.filter((option) => {
+                                  
+                                  const input = state.inputValue.toLowerCase();
+                                  
+                                  return (
+                                    option.station_name.toLowerCase().includes(input) ||
+                                    option.station_code.toLowerCase().includes(input)
+                                  );
+                                })
+                              }
                               renderOption={(props, option) => (
                                 <MenuItem {...props} key={option.id}>
                                   <div className='w-full flex justify-between gap-1'>
@@ -233,6 +244,17 @@ const FormTravelingAllowanceAdd = () => {
                               fullWidth
                               options={data && data?.stations ? data?.stations.filter((station) => station.id !== fromStation) : []}
                               getOptionLabel={(option) => option?.station_name || ''}
+                              filterOptions={(options, state) =>
+                                options.filter((option) => {
+                                  
+                                  const input = state.inputValue.toLowerCase();
+                                  
+                                  return (
+                                    option.station_name.toLowerCase().includes(input) ||
+                                    option.station_code.toLowerCase().includes(input)
+                                  );
+                                })
+                              }
                               renderOption={(props, option) => (
                                 <MenuItem {...props} key={option.id}>
                                   <div className='w-full flex justify-between gap-1'>

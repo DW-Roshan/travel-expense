@@ -22,17 +22,15 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
 
+import { useSession } from 'next-auth/react'
+
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-
-import { getCookie } from '@/utils/cookies'
-
 import { MenuProps } from '@/configs/customDataConfig'
-import { useSession } from 'next-auth/react'
 
 
 // import { toast } from 'react-toastify'

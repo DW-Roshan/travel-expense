@@ -14,14 +14,13 @@ import Button from '@mui/material/Button'
 
 import { toast } from 'react-toastify'
 
+import { useSession } from 'next-auth/react'
+
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-
-import { getCookie } from '@/utils/cookies'
-import { useSession } from 'next-auth/react'
 
 const TravelAllowanceListTable = () => {
 
@@ -133,17 +132,17 @@ const TravelAllowanceListTable = () => {
                     <td className='border-is' rowSpan={travel.travel_data.length + 1}>{ new Date(travel.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                   </tr>
                   {travel.travel_data.map((report) => (
-                    <tr key={`report-${report.id}`}>
-                      <td className='border-is'>{report.train.train_no}</td>
-                      <td className='border-is'>{report.from_station.station_name}</td>
-                      <td className='border-is'>{report.to_station.station_name}</td>
+                    <tr key={`report-${report?.id}`}>
+                      <td className='border-is'>{report?.train?.train_no}</td>
+                      <td className='border-is'>{report?.from_station?.station_name}</td>
+                      <td className='border-is'>{report?.to_station?.station_name}</td>
                       <td className='border-is'>
-                        { new Date(report.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report.from_date).getFullYear()} {new Date(report.from_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                        { new Date(report?.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.from_date).getFullYear()} {new Date(report?.from_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                       </td>
                       <td className='border-is'>
-                      { new Date(report.arrived_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report.arrived_date).getFullYear()} {new Date(report.arrived_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                      { new Date(report?.arrived_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.arrived_date).getFullYear()} {new Date(report?.arrived_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                       </td>
-                      <td className='border-is'>{ new Date(report.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                      <td className='border-is'>{ new Date(report?.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                     </tr>
                   ))}
                 </React.Fragment>

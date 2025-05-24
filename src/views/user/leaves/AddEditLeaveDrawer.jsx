@@ -12,13 +12,13 @@ import Divider from '@mui/material/Divider'
 // Third-party Imports
 import { useForm, Controller } from 'react-hook-form'
 
+import { toast } from 'react-toastify'
+
+import { useSession } from 'next-auth/react'
+
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-
-import { getCookie } from '@/utils/cookies'
-import { toast } from 'react-toastify'
-import { useSession } from 'next-auth/react'
 
 // Vars
 
