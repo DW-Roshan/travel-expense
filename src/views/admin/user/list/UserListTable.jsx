@@ -170,10 +170,10 @@ const UserListTable = ({ tableData }) => {
         header: 'User',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original?.profile_image, fullName: row.original?.first_name+" "+row.original?.last_name })}
+            {getAvatar({ avatar: row.original?.profile_image, fullName: row.original?.first_name + " " + row.original?.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
-                {row.original?.first_name+" "+row.original?.last_name}
+                {row.original?.first_name + " " + row.original?.last_name}
               </Typography>
               <Typography variant='body2'>{row.original?.username}</Typography>
             </div>
@@ -288,13 +288,15 @@ const UserListTable = ({ tableData }) => {
             {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
-            <IconButton>
+            {/* <IconButton> */}
               {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
-                <i className='tabler-eye text-textSecondary' />
+              {/* <i className='tabler-eye text-textSecondary' /> */}
               {/* </Link> */}
-            </IconButton>
+            {/* </IconButton> */}
             <IconButton>
-              <i className='tabler-edit text-textSecondary' />
+              <Link href={getLocalizedUrl(`/admin/user/${row.original.id}/edit`, locale)} className='flex'>
+                <i className='tabler-edit text-textSecondary' />
+              </Link>
             </IconButton>
             {/* <OptionMenu
               iconButtonProps={{ size: 'medium' }}

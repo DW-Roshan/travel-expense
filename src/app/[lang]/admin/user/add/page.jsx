@@ -2,7 +2,7 @@
 import Grid from '@mui/material/Grid2'
 
 // Component Imports
-import FormUserAdd from '@/views/apps/user/add/FormUserAdd'
+import FormUserAdd from '@/views/admin/user/add/FormUserAdd'
 
 const AddUser = () => {
   return (

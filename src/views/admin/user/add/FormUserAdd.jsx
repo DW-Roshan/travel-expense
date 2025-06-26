@@ -22,19 +22,19 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { FormControl, FormControlLabel, FormLabel, Menu, Radio, RadioGroup, Select } from '@mui/material'
 
+import { useSession } from 'next-auth/react'
+
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-
-import { getCookie } from '@/utils/cookies'
-
 import { MenuProps } from '@/configs/customDataConfig'
 
 
 // import { toast } from 'react-toastify'
+
 
 
 const defaultValues = {
@@ -64,7 +64,7 @@ const defaultValues = {
   gPay: ''
 }
 
-const FormUserAdd = () => {
+const FormUserAdd = ({ userId, userData, allData }) => {
   // States
   const [formData, setFormData] = useState({
     username: '',
@@ -94,7 +94,10 @@ const FormUserAdd = () => {
     phoneNumber: ''
   })
 
-  const [data, setData] = useState();
+  const { data: session } = useSession()
+  const token = session?.user?.token
+
+  const [data, setData] = useState(allData || null);
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -104,13 +107,15 @@ const FormUserAdd = () => {
   useEffect(() => {
 
     const fetchData = async () => {
-      const token = await getCookie('token');
+      // const token = await getCookie('token');
+
+      if(!token) return
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/add`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token.value}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -129,7 +134,7 @@ const FormUserAdd = () => {
 
     fetchData();
 
-  }, []);
+  }, [token]);
 
   const handleClickShowPassword = () => setFormData(show => ({ ...show, isPasswordShown: !show.isPasswordShown }))
 
@@ -176,49 +181,118 @@ const FormUserAdd = () => {
     setError,
     watch,
     formState: { errors }
-  } = useForm({ defaultValues })
+  } = useForm({
+    values: {
+      username: userData?.username || '',
+      email: userData?.email || '',
+      password: '',
+      password_confirmation: '',
+      firstName: userData?.first_name || '',
+      lastName: userData?.last_name || '',
+      dateOfBirth: userData?.date_of_birth || null,
+      dateOfJoining: userData?.date_of_joining || null,
+      gender: userData?.gender || 'm',
+      pfNo: userData?.pf_no || '',
+      fatherName: userData?.father_name || '',
+      firstClassDutyPassNo: userData?.first_class_duty_pass_no || '',
+      branch: userData?.branch_id || '',
+      division: userData?.division_id || '',
+      designation: userData?.designation_id || '',
+      station: userData?.station_head_quarter_id || '',
+      phoneNumber: userData?.mobile_no || '',
+      checkingAuthority: userData?.authority_no || '',
+      loginValidUpto: userData?.expiry_date || null,
+      taSrNo: userData?.ta_sr_no || '',
+      incentiveAmt: userData?.incentive_amount && parseInt(userData?.incentive_amount).toString() || '',
+      incentivePercentage: userData?.incentive_percentage && parseInt(userData?.incentive_percentage).toString() || '',
+      payBand: userData?.pay_band && parseInt(userData?.pay_band).toString() || '',
+      gPay: userData?.g_pay && parseInt(userData?.g_pay).toString() || ''
+    }
+   })
 
   const onSubmit = async (data) => {
 
-    const token = await getCookie('token');
+    // const token = await getCookie('token');
 
     if(token){
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/store`, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.value}`
-        },
-        body: JSON.stringify(data)
-      });
+      if(userId){
 
-      const result = await res.json();
-
-      if(res.ok){
-
-        sessionStorage.setItem('success', result.message);
-
-        router.push('/admin/user/list');
-
-        reset();
-
-
-      } else if(res.status == 422) {
-
-        // Laravel returns validation errors in the `errors` object
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          setError(field, {
-            type: 'manual',
-            message: messages[0], // Use the first error message for each field
-          });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/${userId}`, {
+          method: 'put',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
         });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/admin/user/list');
+
+          reset();
+
+
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'manual',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/admin/user/list');
+
+        }
+
       } else {
-        sessionStorage.setItem('error', result.message);
 
-        router.push('/admin/user/list');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/user/store`, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/admin/user/list');
+
+          reset();
+
+
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'manual',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/admin/user/list');
+
+        }
       }
     }
   }
@@ -268,50 +342,51 @@ const FormUserAdd = () => {
                 )} />
             </Grid>
 
-            {/* Password */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="password" control={control}
-                rules={{ required: 'This field is required.' }}
-                render={({ field }) => (
-                  <CustomTextField fullWidth label={<>Password <span className='text-error'>*</span></>} required={false} placeholder="••••••••"
-                    type={showPassword ? 'text' : 'password'}
-                    error={!!errors.password} helperText={errors.password?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword(p => !p)}>
-                            <i className={showPassword ? 'tabler-eye-off' : 'tabler-eye'} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    {...field} />
-                )} />
-            </Grid>
+            {!userId && <>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="password" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>Password <span className='text-error'>*</span></>} required={false} placeholder="••••••••"
+                      type={showPassword ? 'text' : 'password'}
+                      error={!!errors.password} helperText={errors.password?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(p => !p)}>
+                              <i className={showPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                      {...field} />
+                  )} />
+              </Grid>
 
-            {/* Confirm Password */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="password_confirmation" control={control}
-                rules={{
-                  required: 'This field is required.',
-                  validate: value => value === password || 'Passwords do not match'
-                }}
-                render={({ field }) => (
-                  <CustomTextField fullWidth label={<>Confirm Password <span className='text-error'>*</span></>} placeholder="••••••••"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    error={!!errors.password_confirmation} helperText={errors.password_confirmation?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword(p => !p)}>
-                            <i className={showConfirmPassword ? 'tabler-eye-off' : 'tabler-eye'} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    {...field} />
-                )} />
-            </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="password_confirmation" control={control}
+                  rules={{
+                    required: 'This field is required.',
+                    validate: value => value === password || 'Passwords do not match'
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>Confirm Password <span className='text-error'>*</span></>} placeholder="••••••••"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      error={!!errors.password_confirmation} helperText={errors.password_confirmation?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowConfirmPassword(p => !p)}>
+                              <i className={showConfirmPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                      {...field} />
+                  )} />
+              </Grid>
+
+            </>}
 
             {/* ==================== 2. Personal Info ==================== */}
             <Grid size={{ xs: 12 }}><Divider /></Grid>
@@ -360,7 +435,7 @@ const FormUserAdd = () => {
                     <RadioGroup row {...field}>
                       <FormControlLabel value="m" control={<Radio />} label="Male" />
                       <FormControlLabel value="f" control={<Radio />} label="Female" />
-                      <FormControlLabel value="o" control={<Radio />} label="Other" />
+                      {/* <FormControlLabel value="o" control={<Radio />} label="Other" /> */}
                     </RadioGroup>
                   )} />
               </FormControl>
@@ -369,10 +444,13 @@ const FormUserAdd = () => {
             {/* Father Name & PF No */}
             {[
               ['fatherName', 'Father Name'],
-              ['pfNo', 'PF No.']
-            ].map(([name, label]) => (
+              ['pfNo', 'PF No.', 25]
+            ].map(([name, label, limit = 100]) => (
               <Grid size={{ xs: 12, sm: 6 }} key={name}>
                 <Controller name={name} control={control}
+                  rules={{
+                    maxLength: limit ? { value: limit, message: `Max length for this field is ${limit} characters.` } : undefined,
+                  }}
                   render={({ field }) => (
                     <CustomTextField fullWidth label={label}
                       error={!!errors[name]} helperText={errors[name]?.message} {...field} />
@@ -438,15 +516,48 @@ const FormUserAdd = () => {
 
             {/* Phone + Checking Authority */}
             {[
-              ['phoneNumber', 'Mobile No.', 'number', true],
-              ['checkingAuthority', 'Checking Authority No']
-            ].map(([name, label, type = 'text', required = false]) => (
+              ['phoneNumber', 'Mobile No.', 15, 'number', true],
+              ['checkingAuthority', 'Checking Authority No', 15]
+            ].map(([name, label, limit = 20, type = 'text', required = false]) => (
               <Grid size={{ xs: 12, sm: 6 }} key={name}>
                 <Controller name={name} control={control}
-                  rules={{required: required && 'This field is required.'}}
+                  rules={{
+                    required: required && 'This field is required.',
+                    maxLength: {
+                      value: limit,
+                      message: `Maximum ${limit} characters allowed`
+                    },
+                    validate: {
+                      validFormat: (value) => {
+                        if (type === 'number') {
+
+                          return /^[0-9]+$/.test(value) || 'Must be a valid number.';
+                        }
+
+                        return true; // No validation for other fields
+                      }
+                    }
+                  }}
                   render={({ field }) => (
-                    <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
-                      error={!!errors[name]} helperText={errors[name]?.message} {...field} />
+                    <CustomTextField
+                      fullWidth
+                      label={<>{label} {required && <span className='text-error'>*</span> }</>}
+                      error={!!errors[name]}
+                      helperText={errors[name]?.message}
+                      {...field}
+
+                      {...(type === 'number' &&
+                        {
+                          onInput: (e) => {
+                            e.target.value = e.target.value.replace(/[^0-9+]/g, '');
+                          },
+                          inputProps: {
+                            maxLength: 15,
+                            inputMode: 'tel',
+                          }
+                        }
+                      )}
+                    />
                   )} />
               </Grid>
             ))}
@@ -458,14 +569,86 @@ const FormUserAdd = () => {
             </Grid>
 
             {[
-              ['firstClassDutyPassNo', '1st Class Duty Pass No.'],
-              ['taSrNo', 'Ta Sr No.'],
+              ['firstClassDutyPassNo', '1st Class Duty Pass No.', 'text', false, '20'],
+              ['taSrNo', 'Ta Sr No.', 'text', false, '15'],
+              ['incentiveAmt', 'Incentive Amt', 'number', false, '5'],
+              ['incentivePercentage', 'Incentive Percentage %', 'number'],
+              ['payBand', 'Pay Band', 'number', true, 5],
+              ['gPay', 'G Pay', 'number', true, 6]
+            ].map(([name, label, type = 'text', required = false, limit]) => {
+              const isLimitedField = name === 'gPay' || name === 'payBand';
+              const isPercentageField = name === 'incentivePercentage';
+
+              return (
+                <Grid size={{ xs: 12, sm: 6 }} key={name}>
+                  <Controller
+                    name={name}
+                    control={control}
+                    rules={{
+                      required: required && 'This field is required.',
+                      ...(type === 'number' && {
+                        validate: {
+                          validNumber: (value) => {
+                            // Ensure the value contains only digits and has a max length
+                            if (value && !/^\d+$/.test(value)) {
+
+                              return 'This field must contain only numbers';
+                            }
+
+                            return true;
+                          },
+                          ...(isPercentageField && {
+                            validPercentage: (value) => {
+                              if (value && (value < 0 || value > 100)) {
+
+                                return 'Must be between 0 and 100';
+                              }
+                              
+                              return true;
+                            }
+                          })
+                        }
+                      }),
+                      maxLength: {
+                        value: limit,
+                        message: `Maximum ${limit} characters allowed`
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>{label} {required && <span className='text-error'>*</span>}</>}
+                        {...(type === 'number' && {
+                          onInput: (e) => {
+                            // Allow only digits for number fields
+                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                          },
+                          inputProps: {
+                            maxLength: limit || 15,  // Use dynamic limit for maxLength
+                            inputMode: 'tel',  // Mobile-friendly numeric input
+                          }
+                        })}
+                        error={!!errors[name]}
+                        helperText={errors[name]?.message}
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+              )
+            })}
+
+            {/* {[
+              ['firstClassDutyPassNo', '1st Class Duty Pass No.', 'text', false, '20'],
+              ['taSrNo', 'Ta Sr No.', 'text', false, '15'],
               ['incentiveAmt', 'Incentive Amt', 'number'],
               ['incentivePercentage', 'Incentive Percentage %', 'number'],
               ['payBand', 'Pay Band', 'number', true],
               ['gPay', 'G Pay', 'number', true]
-            ].map(([name, label, type = 'text', required = false]) => {
+            ].map(([name, label, type = 'text', required = false, limit]) => {
               const isLimitedField = name === 'gPay' || name === 'payBand';
+
+              const percentage = name === 'incentivePercentage';
 
               return (
                 <Grid size={{ xs: 12, sm: 6 }} key={name}>
@@ -480,12 +663,23 @@ const FormUserAdd = () => {
                       })
                     }}
                     render={({ field }) => (
-                      <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>} type={type}
+                      <CustomTextField fullWidth label={<>{label} {required && <span className='text-error'>*</span> }</>}
+                        {...(type === 'number' &&
+                          {
+                            onInput: (e) => {
+                              e.target.value = e.target.value.replace(/[^0-9+]/g, '');
+                            },
+                            inputProps: {
+                              maxLength: 15,
+                              inputMode: 'tel',
+                            }
+                          }
+                        )}
                         error={!!errors[name]} helperText={errors[name]?.message} {...field} />
                     )} />
                 </Grid>
               )
-            })}
+            })} */}
 
           </Grid>
         </CardContent>

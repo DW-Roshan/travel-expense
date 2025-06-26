@@ -175,7 +175,7 @@ const MovementReport = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.length > 0 ? data.map((travel, index) => (
+                    {data?.length > 0 ? data?.map((travel, index) => (
                       <tr key={index}>
                         <td className='border'>{travel.date}</td>
                         <td className='border'>{travel.type == 'travel' && travel.trains}</td>

@@ -1,7 +1,8 @@
 import { getServerSession } from 'next-auth';
 
 // Component Imports
-import UserList from '@views/apps/user/list'
+import UserList from '@views/admin/user/list'
+import { authOptions } from '@/libs/auth';
 
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
@@ -14,21 +15,24 @@ import UserList from '@views/apps/user/list'
  */
 
 const getUserData = async () => {
-  const session = await getServerSession();
-  const token = session?.user?.token
-  
-  if(!token) return
-  
+
   // Vars
-  
   try {
+
+    const session = await getServerSession(authOptions);
+    const token = session?.user?.token
+
+    if(!token) return
+    
     // const token = await getCookie('token');
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // Timeout after 15 seconds
+    // const controller = new AbortController();
+    // const timeout = setTimeout(() => controller.abort(), 15000); // Timeout after 15 seconds
 
-    const res = await fetch(`${process.env.API_URL}/admin/users`, {
-      signal: controller.signal,
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
+
+      // signal: controller.signal,
+
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -52,7 +56,7 @@ const UserListApp = async () => {
   // Vars
   const userData = await getUserData()
 
-  return <UserList />
+  return <UserList userData={userData} />
 }
 
 export default UserListApp
