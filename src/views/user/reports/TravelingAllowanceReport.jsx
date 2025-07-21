@@ -239,7 +239,7 @@ const TravelingAllowanceReport = () => {
                               </td>
                             )}
                           </tr>
-                        ))} 
+                        ))}
                         <tr>
                           <td className="border-is">{index + 1}.</td>
                           <td className="border-is">
@@ -382,26 +382,30 @@ const TravelingAllowanceReport = () => {
                           amount = "300";
                         }
 
-                        return (
-                          <tr key={index}>
-                            {/* <td className="border pli-2 plb-0.5">{index + 1}.</td> */}
-                            <td className="border pli-2 plb-0.5">{fromDateStr}</td>
-                            <td className="border pli-2 plb-0.5">{trainNos}</td>
-                            <td className="border pli-2 plb-0.5">{fromStations}</td>
-                            <td className="border pli-2 plb-0.5">{toStations}</td>
-                            <td className="border pli-2 plb-0.5">{depTimes}</td>
-                            <td className="border pli-2 plb-0.5">{arrTimes}</td>
-                            <td className="border pli-2 plb-0.5">{travel?.hrs_out_of_hq}</td>
-                            <td className="border pli-2 plb-0.5">{percentage}</td>
-                            <td className="border pli-2 plb-0.5">{amount}</td>
-                            <td className="border pli-2 plb-0.5">0</td>
-                            {index === 0 && (
-                              <td rowSpan={data?.length} className={`border pli-2 plb-0.5 [writing-mode:sideways-lr] [text-orientation:mixed]`}>
-                                Check Tickets in Running Train
-                              </td>
-                            )}
-                          </tr>
-                        );
+                        if(travel?.is_in_month){
+                          
+                          return (
+                            <tr key={index}>
+                              {/* <td className="border pli-2 plb-0.5">{index + 1}.</td> */}
+                              <td className="border pli-2 plb-0.5">{fromDateStr}</td>
+                              <td className="border pli-2 plb-0.5">{trainNos}</td>
+                              <td className="border pli-2 plb-0.5">{fromStations}</td>
+                              <td className="border pli-2 plb-0.5">{toStations}</td>
+                              <td className="border pli-2 plb-0.5">{depTimes}</td>
+                              <td className="border pli-2 plb-0.5">{arrTimes}</td>
+                              <td className="border pli-2 plb-0.5">{travel?.hrs_out_of_hq}</td>
+                              <td className="border pli-2 plb-0.5">{percentage}</td>
+                              <td className="border pli-2 plb-0.5">{amount}</td>
+                              <td className="border pli-2 plb-0.5">0</td>
+                              {index === 0 && (
+                                <td rowSpan={data?.length} className={`border pli-2 plb-0.5 [writing-mode:sideways-lr] [text-orientation:mixed]`}>
+                                  Check Tickets in Running Train
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        }
+
                       })}
 
                   </tbody>
