@@ -37,14 +37,14 @@ const userVerticalMenuData = dictionary => [
         href: '/reports/movement-report'
       },
       {
-        label: 'Night Allowance Journal (NDA)',
-        icon: 'tabler-circle',
-        href: '/reports/night-allowance-journal'
-      },
-      {
         label: 'Traveling Allowance Journal (TA)',
         icon: 'tabler-circle',
         href: '/reports/traveling-allowance-journal'
+      },
+      {
+        label: 'Night Allowance Journal (NDA)',
+        icon: 'tabler-circle',
+        href: '/reports/night-allowance-journal'
       }
     ]
   }

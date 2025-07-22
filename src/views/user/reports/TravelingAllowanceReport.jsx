@@ -37,6 +37,7 @@ const TravelingAllowanceReport = () => {
   const token = session?.user?.token
 
   const [data, setData] = useState([]);
+  const [totalAmount, setTotalAmount] = useState();
   const [month, setMonth] = useState(new Date())
   const tableRef = useRef(null);
 
@@ -57,6 +58,7 @@ const TravelingAllowanceReport = () => {
       const jsonData = await response.json();
 
       if (response.status === 200) {
+        setTotalAmount(jsonData.total_amount);
         setData(jsonData.data);
       } else {
         setData([]);
@@ -120,9 +122,9 @@ const TravelingAllowanceReport = () => {
     //   startY: 25
     // })
 
-    const userName = "John Doe"
+    const userName = session?.user?.name
 
-    doc.save(`MR ${month.toLocaleString('en-US', { month: 'short', year: '2-digit' }).toUpperCase()} ${userName}.pdf`)
+    doc.save(`TA ${month.toLocaleString('en-US', { month: 'short', year: '2-digit' }).toUpperCase()} ${userName}.pdf`)
 
     toast.success('Report Downloaded successfully.')
   }
@@ -160,7 +162,7 @@ const TravelingAllowanceReport = () => {
             </Grid>
             <Grid size={{ xs: 12 }}>
               <div className='overflow-x-auto'>
-                <table className={` table-auto w-full border-collapse text-center`}>
+                <table ref={tableRef} className={` table-auto w-full border-collapse text-center`}>
                   <thead>
                     <tr>
                       {/* <th rowSpan={2} className="border p-2">Sr No.</th> */}
@@ -367,23 +369,23 @@ const TravelingAllowanceReport = () => {
                         ));
 
                         // Determine %AGE and amount
-                        const hours = travel?.hrs_out_of_hq || "0";
-                        let percentage = "0%";
-                        let amount = "0";
+                        // const hours = travel?.hrs_out_of_hq || "0";
+                        // let percentage = "0%";
+                        // let amount = "0";
 
-                        if (hours > "12:00") {
-                          percentage = "100%";
-                          amount = "1000 "+ hours;
-                        } else if (hours > "06:00") {
-                          percentage = "70%";
-                          amount = "700 " + hours;
-                        } else if (hours > "0") {
-                          percentage = "30%";
-                          amount = "300";
-                        }
+                        // if (hours > "12:00") {
+                        //   percentage = "100%";
+                        //   amount = "1000 "+ hours;
+                        // } else if (hours > "06:00") {
+                        //   percentage = "70%";
+                        //   amount = "700 " + hours;
+                        // } else if (hours > "0") {
+                        //   percentage = "30%";
+                        //   amount = "300";
+                        // }
 
                         if(travel?.is_in_month){
-                          
+
                           return (
                             <tr key={index}>
                               {/* <td className="border pli-2 plb-0.5">{index + 1}.</td> */}
@@ -394,11 +396,11 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5">{depTimes}</td>
                               <td className="border pli-2 plb-0.5">{arrTimes}</td>
                               <td className="border pli-2 plb-0.5">{travel?.hrs_out_of_hq}</td>
-                              <td className="border pli-2 plb-0.5">{percentage}</td>
-                              <td className="border pli-2 plb-0.5">{amount}</td>
-                              <td className="border pli-2 plb-0.5">0</td>
+                              <td className="border pli-2 plb-0.5">{travel?.percentage}%</td>
+                              <td className="border pli-2 plb-0.5">{travel?.amount?.rs}</td>
+                              <td className="border pli-2 plb-0.5">{travel?.amount?.p}</td>
                               {index === 0 && (
-                                <td rowSpan={data?.length} className={`border pli-2 plb-0.5 [writing-mode:sideways-lr] [text-orientation:mixed]`}>
+                                <td rowSpan={data?.length + 1} className={`rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}
@@ -407,6 +409,24 @@ const TravelingAllowanceReport = () => {
                         }
 
                       })}
+                      {data?.length > 0 ?
+                        <tr>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'><strong>TOTAL</strong></td>
+                          <td className='border'><strong>{totalAmount && parseInt(totalAmount)}</strong></td>
+                          <td className='border'><strong>{totalAmount && +(totalAmount - Math.floor(totalAmount)).toFixed(2)}</strong></td>
+                        </tr>
+                        :
+                        <tr>
+                          <td colSpan={11} className='border'>No Data Found</td>
+                        </tr>
+                      }
 
                   </tbody>
                 </table>

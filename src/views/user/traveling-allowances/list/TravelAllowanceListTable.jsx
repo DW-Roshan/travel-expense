@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid2'
 
 import { toast } from 'react-toastify'
 
@@ -21,6 +22,9 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { CardContent } from '@mui/material'
+import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+import CustomTextField from '@/@core/components/mui/TextField'
 
 const TravelAllowanceListTable = () => {
 
@@ -28,38 +32,40 @@ const TravelAllowanceListTable = () => {
   const { lang: locale } = useParams()
   const { data: session } = useSession()
   const [data, setData] = useState([]);
+  const [month, setMonth] = useState(new Date())
 
   const token = session?.user?.token
 
+  const fetchData = async (date) => {
+    // const token = await getCookie('token');
+
+    if(!token) return
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances${date ? `?month=${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}` : ''}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const jsonData = await response.json();
+
+      console.log('jsonData', jsonData);
+
+      // if(response.status === 401) {
+      //   router.push('/not-authorized');
+      // }
+
+      setData(jsonData.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setData(null);
+    }
+  };
+
   useEffect(() => {
 
-    const fetchData = async () => {
-      // const token = await getCookie('token');
-
-      if(!token) return
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const jsonData = await response.json();
-
-        console.log('jsonData', jsonData);
-
-        // if(response.status === 401) {
-        //   router.push('/not-authorized');
-        // }
-
-        setData(jsonData.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setData(null);
-      }
-    };
 
     fetchData();
 
@@ -88,6 +94,14 @@ const TravelAllowanceListTable = () => {
     });
   }, []);
 
+  const handleMonthChange = async (date) => {
+
+    setMonth(date);
+
+    await fetchData(date);
+
+  }
+
   return (
     <>
       <Card>
@@ -106,50 +120,66 @@ const TravelAllowanceListTable = () => {
             </div>
           </div>
         } />
-        <div className='overflow-x-auto'>
-          <table className={tableStyles.table}>
-            <thead>
-              <tr>
-                <th rowSpan={2} className='border-ie'>Sr No.</th>
-                <th rowSpan={2} className='border-ie'>Month & Date</th>
-                <th rowSpan={2} className='border-ie'>Train No.</th>
-                <th colSpan={2} className='border'>Station</th>
-                <th colSpan={2} className='border'>Time</th>
-                <th rowSpan={2} className='border-is'>Created Date</th>
-              </tr>
-              <tr>
-                <th className='border-ie'>From Station</th>
-                <th className='border-ie'>To Station</th>
-                <th className='border-ie'>Left</th>
-                <th className='border-ie'>Arrived Date Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.length > 0 && data.map((travel, index) => (
-                <React.Fragment key={`group-${index}`}>
-                  <tr>
-                    <td className='border-is' rowSpan={travel.travel_data.length + 1}>{index + 1}.</td>
-                    <td className='border-is' rowSpan={travel.travel_data.length + 1}>{ new Date(travel.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                  </tr>
-                  {travel.travel_data.map((report) => (
-                    <tr key={`report-${report?.id}`}>
-                      <td className='border-is'>{report?.train?.train_no}</td>
-                      <td className='border-is'>{report?.from_station?.station_name}</td>
-                      <td className='border-is'>{report?.to_station?.station_name}</td>
-                      <td className='border-is'>
-                        { new Date(report?.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.from_date).getFullYear()} {new Date(report?.from_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                      </td>
-                      <td className='border-is'>
-                      { new Date(report?.arrived_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.arrived_date).getFullYear()} {new Date(report?.arrived_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                      </td>
-                      <td className='border-is'>{ new Date(report?.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+        <CardContent>
+          <Grid container spacing={6}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <AppReactDatepicker
+                selected={month}
+                id='select-month'
+                showMonthYearPicker
+                dateFormat='MMM, yyyy'
+                onChange={async (date) => await handleMonthChange(date)}
+                customInput={<CustomTextField label='Select Month' fullWidth />}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <div className='overflow-x-auto'>
+                <table className={tableStyles.table}>
+                  <thead>
+                    <tr>
+                      <th rowSpan={2} className='border'>Sr No.</th>
+                      <th rowSpan={2} className='border'>Month & Date</th>
+                      <th rowSpan={2} className='border'>Train No.</th>
+                      <th colSpan={2} className='border'>Station</th>
+                      <th colSpan={2} className='border'>Time</th>
+                      <th rowSpan={2} className='border'>Created Date</th>
                     </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <tr>
+                      <th className='border'>From Station</th>
+                      <th className='border'>To Station</th>
+                      <th className='border'>Left</th>
+                      <th className='border'>Arrived Date Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.length > 0 && data.map((travel, index) => (
+                      <React.Fragment key={`group-${index}`}>
+                        <tr>
+                          <td className='border' rowSpan={travel.travel_data.length + 1}>{index + 1}.</td>
+                          <td className='border' rowSpan={travel.travel_data.length + 1}>{ new Date(travel.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                        </tr>
+                        {travel.travel_data.map((report) => (
+                          <tr key={`report-${report?.id}`}>
+                            <td className='border'>{report?.train?.train_no}</td>
+                            <td className='border'>{report?.from_station?.station_name}</td>
+                            <td className='border'>{report?.to_station?.station_name}</td>
+                            <td className='border'>
+                              { new Date(report?.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.from_date).getFullYear()} {new Date(report?.from_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                            </td>
+                            <td className='border'>
+                            { new Date(report?.arrived_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(report?.arrived_date).getFullYear()} {new Date(report?.arrived_date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                            </td>
+                            <td className='border'>{ new Date(report?.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Grid>
+          </Grid>
+        </CardContent>
       </Card>
     </>
   )

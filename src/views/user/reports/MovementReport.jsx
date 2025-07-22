@@ -119,7 +119,7 @@ const MovementReport = () => {
     //   startY: 25
     // })
 
-    const userName = "John Doe"
+    const userName = session?.user?.name
 
     doc.save(`MR ${month.toLocaleString('en-US', { month: 'short', year: '2-digit' }).toUpperCase()} ${userName}.pdf`)
 
