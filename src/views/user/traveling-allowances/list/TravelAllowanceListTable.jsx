@@ -17,12 +17,13 @@ import { toast } from 'react-toastify'
 
 import { useSession } from 'next-auth/react'
 
+import { CardContent } from '@mui/material'
+
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { CardContent } from '@mui/material'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import CustomTextField from '@/@core/components/mui/TextField'
 
