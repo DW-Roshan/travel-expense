@@ -11,7 +11,7 @@ const userVerticalMenuData = dictionary => [
     icon: 'tabler-user',
     children: [
       {
-        label: 'List',
+        label: 'View',
         icon: 'tabler-circle',
         href: '/traveling-allowances/list'
       },

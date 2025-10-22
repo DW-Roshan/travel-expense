@@ -98,47 +98,57 @@ const FormTravelingAllowanceAdd = () => {
 
     // const token = await getCookie('token');
 
-    console.log("data: ", data);
+    const updatedJourneys = data.journeys.map(journey => {
+      return {
+        ...journey,
+        departureDate: `${journey.departureDate}T${journey.departureTime}`,
+        arrivedDate: `${journey.arrivedDate}T${journey.arrivedTime}`
+      };
+    });
 
-    // if(token){
+    console.log("data: ", data, updatedJourneys);
 
-    //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
-    //     method: 'post',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': `Bearer ${token}`
-    //     },
-    //     body: JSON.stringify(data)
-    //   });
+    const updatedData = { journeys: updatedJourneys };
 
-    //   const result = await res.json();
+    if(token){
 
-    //   if(res.ok){
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
 
-    //     sessionStorage.setItem('success', result.message);
+      const result = await res.json();
 
-    //     router.push('/traveling-allowances/list');
+      if(res.ok){
 
-    //     reset();
+        sessionStorage.setItem('success', result.message);
+
+        router.push('/traveling-allowances/list');
+
+        reset();
 
 
-    //   } else if(res.status == 422) {
+      } else if(res.status == 422) {
 
-    //     // Laravel returns validation errors in the `errors` object
-    //     Object.entries(result.errors).forEach(([field, messages]) => {
-    //       setError(field, {
-    //         type: 'custom',
-    //         message: messages[0], // Use the first error message for each field
-    //       });
-    //     });
+        // Laravel returns validation errors in the `errors` object
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          setError(field, {
+            type: 'custom',
+            message: messages[0], // Use the first error message for each field
+          });
+        });
 
-    //   } else {
-    //     sessionStorage.setItem('error', result.message);
+      } else {
+        sessionStorage.setItem('error', result.message);
 
-    //     router.push('/traveling-allowances/list');
+        router.push('/traveling-allowances/list');
 
-    //   }
-    // }
+      }
+    }
   };
 
   return (
@@ -197,9 +207,9 @@ const FormTravelingAllowanceAdd = () => {
                               getOptionLabel={(option) => option?.station_name || ''}
                               filterOptions={(options, state) =>
                                 options.filter((option) => {
-                                  
+
                                   const input = state.inputValue.toLowerCase();
-                                  
+
                                   return (
                                     option.station_name.toLowerCase().includes(input) ||
                                     option.station_code.toLowerCase().includes(input)
@@ -248,9 +258,9 @@ const FormTravelingAllowanceAdd = () => {
                               getOptionLabel={(option) => option?.station_name || ''}
                               filterOptions={(options, state) =>
                                 options.filter((option) => {
-                                  
+
                                   const input = state.inputValue.toLowerCase();
-                                  
+
                                   return (
                                     option.station_name.toLowerCase().includes(input) ||
                                     option.station_code.toLowerCase().includes(input)
@@ -417,23 +427,24 @@ const FormTravelingAllowanceAdd = () => {
                               if (!currentDeparture || !prevArrival) return true;
 
                               // Combine current date and time and previous arrival date and time to compare
-                              const currentDateTime = new Date(`${currentDeparture}T${currentDepartureTime}`);
-                              const prevDateTime = new Date(`${prevArrival}T${prevArrivalTime}`);
+                              // const currentDateTime = new Date(`${currentDeparture}T${currentDepartureTime}`);
+                              // const prevDateTime = new Date(`${prevArrival}T${prevArrivalTime}`);
+
+                              const currentDateTime = new Date(currentDeparture);
+                              const prevDateTime = new Date(prevArrival);
 
                               // Check if the current departure is after the previous arrival
-                              return currentDateTime > prevDateTime || 'Departure time must be greater than the previous arrival time.';
+                              return currentDateTime >= prevDateTime || 'Departure date must be greater than or equal to the previous arrival date.';
                             }
                           }}
                           render={({ field }) => (
                             <CustomTextField
                               {...field}
                               type="date"
-                              label={`Departure Date *`}
+                              label={<>Departure Date {<span className='text-error'>*</span> }</>}
                               fullWidth
-                              // required
                               helperText={errors?.journeys?.[index]?.departureDate?.message}
                               error={Boolean(errors?.journeys?.[index]?.departureDate)}
-                              // onChange={(e) => handleDateChange(e.target.value)} // Handle date change
                               value={field.value}
                               inputProps={{ max: new Date().toISOString().split('T')[0] }} // Ensure no future date
                             />
@@ -448,17 +459,34 @@ const FormTravelingAllowanceAdd = () => {
                           control={control}
                           rules={{
                             required: 'Departure time is required.',
+                            validate: (value, allValues) => {
+                              if (index === 0) return true; // Skip first item
+
+                              const currentDeparture = allValues?.journeys?.[index]?.departureDate;
+                              const currentDepartureTime = value;
+
+                              const prevArrival = allValues?.journeys?.[index - 1]?.arrivedDate;
+                              const prevArrivalTime = allValues?.journeys?.[index - 1]?.arrivedTime;
+
+                              // If there's no current date or previous arrival date, no validation is needed.
+                              if (!currentDeparture || !prevArrival) return true;
+
+                              // Combine current date and time and previous arrival date and time to compare
+                              const currentDateTime = new Date(`${currentDeparture}T${currentDepartureTime}`);
+                              const prevDateTime = new Date(`${prevArrival}T${prevArrivalTime}`);
+
+                              // Check if the current departure is after the previous arrival
+                              return currentDateTime > prevDateTime || 'Departure date & time must be greater than the previous arrival time.';
+                            }
                           }}
                           render={({ field }) => (
                             <CustomTextField
                               {...field}
                               type="time"
-                              label={`Departure Time *`}
+                              label={<>Departure Time {<span className='text-error'>*</span> }</>}
                               fullWidth
-                              // required
                               helperText={errors?.journeys?.[index]?.departureTime?.message}
                               error={Boolean(errors?.journeys?.[index]?.departureTime)}
-                              // onChange={(e) => handleTimeChange(e.target.value)} // Handle time change
                               value={field.value}
                             />
                           )}
@@ -513,6 +541,7 @@ const FormTravelingAllowanceAdd = () => {
                           control={control}
                           rules={{
                             required: 'This field is required.',
+
                             // validate: (_, allValues) => {
                             //   const arrival = allValues?.journeys?.[index]?.arrivedDate;
                             //   const departure = allValues?.journeys?.[index]?.departureDate;
@@ -521,21 +550,20 @@ const FormTravelingAllowanceAdd = () => {
 
                             //   return new Date(arrival) > new Date(departure) || 'Arrival time must be greater then departure time.';
                             // }
+
                           }}
                           render={({ field }) => {
-                            
+
                             const departureDate = watch(`journeys[${index}].departureDate`);
 
                             return (
                               <CustomTextField
                                 {...field}
                                 type="date"
-                                label={`Arrived Date *`}
+                                label={<>Arrived Date {<span className='text-error'>*</span> }</>}
                                 fullWidth
-                                // required
                                 helperText={errors?.journeys?.[index]?.arrivedDate?.message}
                                 error={Boolean(errors?.journeys?.[index]?.arrivedDate)}
-                                // onChange={(e) => handleDateChange(e.target.value)} // Handle date change
                                 value={field.value}
                                 inputProps={{ min: departureDate, max: new Date().toISOString().split('T')[0] }} // Ensure no future date
                               />
@@ -569,12 +597,10 @@ const FormTravelingAllowanceAdd = () => {
                             <CustomTextField
                               {...field}
                               type="time"
-                              label={`Arrived Time *`}
+                              label={<>Arrived Time {<span className='text-error'>*</span> }</>}
                               fullWidth
-                              // required
                               helperText={errors?.journeys?.[index]?.arrivedTime?.message}
                               error={Boolean(errors?.journeys?.[index]?.arrivedTime)}
-                              // onChange={(e) => handleTimeChange(e.target.value)} // Handle time change
                               value={field.value}
                             />
                           )}
