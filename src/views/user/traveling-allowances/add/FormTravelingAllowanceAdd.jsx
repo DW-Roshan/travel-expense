@@ -34,7 +34,7 @@ import { MenuProps } from '@/configs/customDataConfig'
 
 import CustomAutocomplete from '@/@core/components/mui/Autocomplete'
 
-const FormTravelingAllowanceAdd = () => {
+const FormTravelingAllowanceAdd = ({ id }) => {
   // States
   const [data, setData] = useState();
 
@@ -72,6 +72,51 @@ const FormTravelingAllowanceAdd = () => {
     fetchData();
 
   }, [token]);
+
+  useEffect(() => {
+    if(id && token){
+      const fetchEditData = async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/${id}/edit`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const jsonData = await response.json();
+
+          if(response.ok && jsonData){
+
+            if(jsonData && jsonData.data){
+
+              reset({
+                journeys: [{
+                  departureDate: new Date(jsonData.data.from_date).toISOString().split('T')[0],
+                  departureTime: new Date(jsonData.data.from_date).toTimeString().split(' ')[0].slice(0,5),
+                  trainId: jsonData.data.train_id,
+                  arrivedDate: new Date(jsonData.data.arrived_date).toISOString().split('T')[0],
+                  arrivedTime: new Date(jsonData.data.arrived_date).toTimeString().split(' ')[0].slice(0,5),
+                  fromStation: jsonData.data.from_station,
+                  toStation: jsonData.data.to_station,
+                }]
+              })
+
+            }
+          } else {
+            sessionStorage.setItem('error', jsonData?.message || 'Error fetching data for edit.');
+            router.push('/traveling-allowances/list');
+          }
+        } catch (error) {
+          console.error('Error fetching edit data:', error);
+          sessionStorage.setItem('error', 'Error fetching data for edit.');
+          router.push('/traveling-allowances/list');
+        }
+      };
+
+      fetchEditData();
+    }
+  }, [id, token]);
 
   const { control, handleSubmit, watch, reset, formState: { errors }, setError } = useForm({
     defaultValues: {
@@ -112,48 +157,88 @@ const FormTravelingAllowanceAdd = () => {
 
     if(token){
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedData)
-      });
-
-      const result = await res.json();
-
-      if(res.ok){
-
-        sessionStorage.setItem('success', result.message);
-
-        router.push('/traveling-allowances/list');
-
-        reset();
-
-
-      } else if(res.status == 422) {
-
-        // Laravel returns validation errors in the `errors` object
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          setError(field, {
-            type: 'custom',
-            message: messages[0], // Use the first error message for each field
-          });
+      if(id){
+        // Edit Mode - Update existing record
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/${id}`, {
+          method: 'put',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedData)
         });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/traveling-allowances/list');
+
+          reset();
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'custom',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/traveling-allowances/list');
+
+        }
       } else {
-        sessionStorage.setItem('error', result.message);
+      // Add Mode - Create new record
 
-        router.push('/traveling-allowances/list');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/store`, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedData)
+        });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/traveling-allowances/list');
+
+          reset();
+
+
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'custom',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/traveling-allowances/list');
+
+        }
       }
     }
   };
 
   return (
     <Card className='overflow-visible'>
-      <CardHeader title='Add Traveling Allowance' />
+      <CardHeader title={`${id ? 'Edit' : 'Add'} Traveling Allowance`} action={<Button variant='tonal' onClick={() => router.back()} startIcon={<i className='tabler-arrow-back' />}>Back</Button>} />
       <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
@@ -618,6 +703,7 @@ const FormTravelingAllowanceAdd = () => {
                 )
               })}
             </Grid>
+            {!id && (
             <Grid size={{ xs: 12 }}>
               <Button
                 size='small'
@@ -638,6 +724,7 @@ const FormTravelingAllowanceAdd = () => {
                 Add More
               </Button>
             </Grid>
+            )}
           </Grid>
         </CardContent>
         <Divider />
