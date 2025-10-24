@@ -23,6 +23,17 @@ import CustomTextField from '@/@core/components/mui/TextField'
 import CustomIconButton from '@/@core/components/mui/IconButton'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
+// Client-only wrapper for dynamic content
+const ClientOnly = ({ children, fallback = null }) => {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) return fallback
+
+  return <>{children}</>
+}
+
 const TravelAllowanceListTable = () => {
   const { lang: locale } = useParams()
   const { data: session } = useSession()
@@ -236,11 +247,13 @@ const TravelAllowanceListTable = () => {
                               className='border text-center'
                               rowSpan={travel.travel_data.length + 1}
                             >
-                              {new Date(travel.from_date).toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric'
-                              })}
+                              <ClientOnly>
+                                {new Date(travel.from_date).toLocaleDateString('en-GB', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric'
+                                })}
+                              </ClientOnly>
                             </td>
                           </tr>
 
@@ -256,31 +269,38 @@ const TravelAllowanceListTable = () => {
                                 {report?.to_station?.station_name}
                               </td>
                               <td className='border text-center'>
-                                {new Date(report?.from_date).toLocaleString('en-GB', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: false
-                                })}
+                                <ClientOnly>
+                                  {new Date(report?.from_date).toLocaleString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                  })}
+                                </ClientOnly>
                               </td>
                               <td className='border text-center'>
-                                {new Date(report?.arrived_date).toLocaleString('en-GB', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: false
-                                })}
+                                <ClientOnly>
+                                  {new Date(report?.arrived_date).toLocaleString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                  })}
+                                </ClientOnly>
                               </td>
                               <td className='border text-center'>
-                                {new Date(report?.created_at).toLocaleDateString('en-GB', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric'
-                                })}
+                                <ClientOnly>
+                                  {new Date(report?.created_at).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                  })}
+                                </ClientOnly>
                               </td>
                               <td className='border text-center'>
+                                <ClientOnly>
                                 {
                                   new Date(report?.from_date) >= new Date(new Date().setDate(new Date().getDate() - 40)) && (
                                     <Checkbox
@@ -289,6 +309,7 @@ const TravelAllowanceListTable = () => {
                                     />
                                   )
                                 }
+                                </ClientOnly>
 
                                 <Link
                                   href={getLocalizedUrl(
