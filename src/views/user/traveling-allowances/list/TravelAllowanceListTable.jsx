@@ -1,9 +1,13 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+
 import Link from 'next/link'
+
 import { useParams } from 'next/navigation'
+
 import { useSession } from 'next-auth/react'
+
 import { toast } from 'react-toastify'
 
 import Card from '@mui/material/Card'
@@ -32,6 +36,7 @@ const TravelAllowanceListTable = () => {
   // 🔹 Fetch Data
   const fetchData = async (date) => {
     if (!token) return
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances${
@@ -48,6 +53,7 @@ const TravelAllowanceListTable = () => {
       )
 
       const jsonData = await response.json()
+
       setData(jsonData.data || [])
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -78,32 +84,43 @@ const TravelAllowanceListTable = () => {
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) {
       toast.error('No records selected.')
+
       return
     }
+
     setOpenConfirm(true)
   }
 
   const confirmDelete = async () => {
     try {
-      await Promise.all(
-        selectedIds.map((id) =>
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/${id}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
-            }
-          })
-        )
-      )
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/traveling-allowances/bulk-delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ ids: selectedIds })
+      });
 
-      toast.success('Selected travel allowances deleted successfully.')
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data?.message || 'Failed to delete selected allowances.')
+
+        throw new Error(data?.message || 'Failed to delete')
+      }
+
+      toast.success(data?.message || 'Selected travel allowances deleted successfully.')
       setSelectedIds([])
       fetchData(month)
     } catch (error) {
-      console.error('Error deleting traveling allowance:', error)
-      toast.error('Failed to delete selected allowances.')
+
+      // console.error('Error deleting traveling allowance:', error)
+      // toast.error('Failed to delete selected allowances.')
+
+      throw error
     }
+
     setOpenConfirm(false)
   }
 
@@ -132,7 +149,7 @@ const TravelAllowanceListTable = () => {
                   onClick={handleBulkDelete}
                   disabled={selectedIds.length === 0}
                 >
-                  Delete Selected
+                  Delete
                 </Button>
               </div>
             </div>
@@ -147,6 +164,7 @@ const TravelAllowanceListTable = () => {
                 id='select-month'
                 showMonthYearPicker
                 dateFormat='MMM, yyyy'
+                maxDate={new Date()}
                 onChange={async (date) => await handleMonthChange(date)}
                 customInput={<CustomTextField label='Select Month' fullWidth />}
               />
@@ -157,8 +175,6 @@ const TravelAllowanceListTable = () => {
                 <table className={tableStyles.table}>
                   <thead>
                     <tr>
-                      <th rowSpan={2} className='border'>
-                      </th>
                       <th rowSpan={2} className='border'>Sr No.</th>
                       <th rowSpan={2} className='border'>Month & Date</th>
                       <th rowSpan={2} className='border'>Train No.</th>
@@ -166,11 +182,11 @@ const TravelAllowanceListTable = () => {
                       <th colSpan={2} className='border'>Time</th>
                       <th rowSpan={2} className='border'>Created Date</th>
                       <th rowSpan={2} className='border'>
-
                         <Checkbox
                           checked={
                             data
                               .flatMap((d) => d.travel_data)
+                              .filter((r) => new Date(r.from_date) >= new Date(new Date().setDate(new Date().getDate() - 40))) // ✅ only last 40 days
                               .every((r) => selectedIds.includes(r.id)) &&
                             selectedIds.length > 0
                           }
@@ -178,17 +194,24 @@ const TravelAllowanceListTable = () => {
                             selectedIds.length > 0 &&
                             !data
                               .flatMap((d) => d.travel_data)
+                              .filter((r) => new Date(r.from_date) >= new Date(new Date().setDate(new Date().getDate() - 40))) // ✅ only last 40 days
                               .every((r) => selectedIds.includes(r.id))
                           }
                           onChange={(e) => {
+                            const recentIds = data
+                              .flatMap((d) => d.travel_data)
+                              .filter((r) => new Date(r.from_date) >= new Date(new Date().setDate(new Date().getDate() - 40))) // ✅ only last 40 days
+                              .map((r) => r.id)
+
                             if (e.target.checked) {
-                              setSelectedIds(data.flatMap((d) => d.travel_data.map((r) => r.id)))
+                              setSelectedIds(recentIds)
                             } else {
                               setSelectedIds([])
                             }
                           }}
                         />
-                        Action</th>
+                        Action
+                      </th>
                     </tr>
                     <tr>
                       <th className='border'>From Station</th>
@@ -203,10 +226,6 @@ const TravelAllowanceListTable = () => {
                       data.map((travel, index) => (
                         <React.Fragment key={`group-${index}`}>
                           <tr>
-                            <td
-                              className='border text-center'
-                              rowSpan={travel.travel_data.length + 1}
-                            ></td>
                             <td
                               className='border text-center'
                               rowSpan={travel.travel_data.length + 1}
@@ -262,10 +281,15 @@ const TravelAllowanceListTable = () => {
                                 })}
                               </td>
                               <td className='border text-center'>
-                                <Checkbox
-                                  checked={isSelected(report?.id)}
-                                  onChange={() => toggleSelect(report?.id)}
-                                />
+                                {
+                                  new Date(report?.from_date) >= new Date(new Date().setDate(new Date().getDate() - 40)) && (
+                                    <Checkbox
+                                      checked={isSelected(report?.id)}
+                                      onChange={() => toggleSelect(report?.id)}
+                                    />
+                                  )
+                                }
+
                                 <Link
                                   href={getLocalizedUrl(
                                     `/traveling-allowances/${report?.id}/edit`,
