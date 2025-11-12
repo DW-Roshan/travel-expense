@@ -303,9 +303,9 @@ const FormTravelingAllowanceAdd = ({ id }) => {
                               }
                               renderOption={(props, option) => (
                                 <MenuItem {...props} key={option.id}>
-                                  <div className='w-full flex justify-between gap-1'>
+                                  <div className='w-full flex items-center gap-2 text-xs'>
+                                    <Chip label={option.station_code} size='small' variant='contained' color='primary' className='w-[60px] text-xs' />
                                     {option.station_name}
-                                    <Chip label={option.station_code} size='small' variant='tonal' color='success' />
                                   </div>
                                 </MenuItem>
                               )}
@@ -354,9 +354,9 @@ const FormTravelingAllowanceAdd = ({ id }) => {
                               }
                               renderOption={(props, option) => (
                                 <MenuItem {...props} key={option.id}>
-                                  <div className='w-full flex justify-between gap-1'>
+                                  <div className='w-full flex items-center gap-2 text-xs'>
+                                    <Chip label={option.station_code} size='small' variant='contained' color='primary' className='w-[60px] text-xs' />
                                     {option.station_name}
-                                    <Chip label={option.station_code} size='small' variant='tonal' color='success' />
                                   </div>
                                 </MenuItem>
                               )}

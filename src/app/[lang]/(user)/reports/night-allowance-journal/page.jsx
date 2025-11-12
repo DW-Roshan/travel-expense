@@ -1,6 +1,9 @@
+import NightTravelingAllowanceReport from "@/views/user/reports/NightTravelingAllowanceReport"
 
 const Reports = () => {
-  return "Night Allowance Journal"
+
+  return (<NightTravelingAllowanceReport />)
+
 }
 
 export default Reports
