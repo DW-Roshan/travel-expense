@@ -37,7 +37,7 @@ const NightTravelingAllowanceReport = () => {
   const token = session?.user?.token
 
   const [data, setData] = useState([]);
-  const [totalAmount, setTotalAmount] = useState();
+  const [totalHours, setTotalHours] = useState();
   const [month, setMonth] = useState(new Date())
   const tableRef = useRef(null);
 
@@ -48,7 +48,7 @@ const NightTravelingAllowanceReport = () => {
 
     try {
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ta${date ? `?month=${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}` : ''}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/nda${date ? `?month=${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}` : ''}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -58,7 +58,7 @@ const NightTravelingAllowanceReport = () => {
       const jsonData = await response.json();
 
       if (response.status === 200) {
-        setTotalAmount(jsonData.total_amount);
+        setTotalHours(jsonData.total_hours);
         setData(jsonData.data);
       } else {
         setData([]);
@@ -124,7 +124,7 @@ const NightTravelingAllowanceReport = () => {
 
     const userName = session?.user?.name
 
-    doc.save(`TA ${month.toLocaleString('en-US', { month: 'short', year: '2-digit' }).toUpperCase()} ${userName}.pdf`)
+    doc.save(`NDA ${month.toLocaleString('en-US', { month: 'short', year: '2-digit' }).toUpperCase()} ${userName}.pdf`)
 
     toast.success('Report Downloaded successfully.')
   }
@@ -165,12 +165,10 @@ const NightTravelingAllowanceReport = () => {
                 <table ref={tableRef} className={` table-auto w-full border-collapse text-center`}>
                   <thead>
                     <tr>
-                      {/* <th rowSpan={2} className="border p-2">Sr No.</th> */}
                       <th rowSpan={2} className="border p-2">Month & Date</th>
                       <th rowSpan={2} className="border p-2">Train No.</th>
                       <th colSpan={2} className="border p-2">Station</th>
                       <th colSpan={2} className="border p-2">Night Shift Employed</th>
-                      {/* <th rowSpan={2} className="border p-is">Created Date</th> */}
                       <th colSpan={2} className="border p-2">Signing</th>
                       <th colSpan={2} className="border p-2">Night Duty Perfomed</th>
                       <th rowSpan={2} className="border p-2">Total Hrs.</th>
@@ -189,284 +187,45 @@ const NightTravelingAllowanceReport = () => {
                   </thead>
 
                   <tbody>
-                    {/* {data?.length > 0 && data?.map((travel, index) => (
-                      <React.Fragment key={`group-${index}`}>
-                        {travel.travel_data.map((report, i) => (
-                          <tr key={`report-${report?.id}`}>
-                            {i === 0 && (
-                              <>
-                                <td rowSpan={travel.travel_data.length} className="border-is">{index + 1}.</td>
-                                <td rowSpan={travel.travel_data.length} className="border-is">
-                                  {format(travel?.from_date, 'dd-MM-yyy')}
-                                </td>
-                              </>
-                            )}
-                            <td className="border-is">{report?.train?.train_no}</td>
-                            <td className="border-is">{new Date(report?.from_date).toDateString() === new Date(travel?.from_date).toDateString() ? (report?.from_station?.station_code) : '-----'}</td>
-                            <td className="border-is">{new Date(report?.arrived_date).toDateString() === new Date(travel?.from_date).toDateString() ? (report?.to_station?.station_code) : '-----'}</td>
-                            <td className="border-is">
-                              {format(report?.from_date, 'dd-MM-yyy') === format(travel?.from_date, 'dd-MM-yyy') ? (
-                                <>
-                                {format(report?.from_date, 'H:mm')}
-                                </>
-                              ) : (
-                                '-----'
-                              )}
-                            </td>
-
-                            <td className="border-is">
-                              {new Date(report?.arrived_date).toDateString() === new Date(travel?.from_date).toDateString() ? (
-                                <>
-                                {format(report?.arrived_date, 'H:mm')}
-                                </>
-                              ) : (
-                                '-----'
-                              )}
-                            </td>
-                            {i === 0 && (<>
-                              <td rowSpan={travel.travel_data.length} className="border">
-                                {travel?.hrs_out_of_hq}
-                              </td>
-                              <td rowSpan={travel.travel_data.length} className="border">
-                                {travel?.hrs_out_of_hq > "12:00" ? '100%' : (travel?.hrs_out_of_hq > "6:00" || travel?.hrs_out_of_hq <= "12:00"  ? '70%' : (travel?.hrs_out_of_hq <= "6:00" ? '30%' : '0%'))}
-                              </td>
-                              <td rowSpan={travel.travel_data.length} className="border">
-                                {travel?.hrs_out_of_hq > "12:00" ? '100%' : (travel?.hrs_out_of_hq > "6:00" || travel?.hrs_out_of_hq <= "12:00"  ? '70%' : (travel?.hrs_out_of_hq <= "6:00" ? '30%' : '0%'))}
-                              </td>
-                              <td rowSpan={travel.travel_data.length} className="border">
-                                0
-                              </td>
-                            </>)}
-                            {index == 0 && (
-                              <td rowSpan={data.length}  className="border">
-                                Check Tickets in Running Train ({data?.length})
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                        <tr>
-                          <td className="border-is">{index + 1}.</td>
-                          <td className="border-is">
-                            {format(travel?.from_date, 'dd-MM-yyy')}
-                          </td>
-                          <td className="border-is">
-                            {travel?.travel_data?.map((report, i) => (
-                              <span key={i}>
-                                {report?.train?.train_no}
-                                <br />
-                              </span>
-                            ) )}
-                          </td>
-                          <td className="border-is">
-                            {travel?.travel_data?.map((report, i) => (
-                              <span key={i}>
-                                {format(report?.from_date, 'dd-MM-yyy') === format(travel?.from_date, 'dd-MM-yyy') ? (
-                                  <>
-                                  {report?.from_station?.station_code}
-                                  </>
-                                ) : (
-                                  '-----'
-                                )}
-                                <br />
-                              </span>
-                            ) )}
-                          </td>
-                          <td className="border">
-                            {travel?.travel_data?.map((report, i) => (
-                              <span key={i}>
-                                {format(report?.arrived_date, 'dd-MM-yyy') === format(travel?.from_date, 'dd-MM-yyy') ? (
-                                  <>
-                                  {report?.to_station?.station_code}
-                                  </>
-                                ) : (
-                                  '-----'
-                                )}
-                                <br />
-                              </span>
-                            ) )}
-                          </td>
-                          <td className="border">
-                            {travel?.travel_data?.map((report, i) => (
-                              <span key={i}>
-                                {format(report?.from_date, 'dd-MM-yyy') === format(travel?.from_date, 'dd-MM-yyy') ? (
-                                  <>
-                                  {format(report?.from_date, 'H:mm')}
-                                  </>
-                                ) : (
-                                  '-----'
-                                )}
-                                <br />
-                              </span>
-                            ) )}
-                          </td>
-                          <td className="border">
-                            {travel?.travel_data?.map((report, i) => (
-                              <span key={i}>
-                                {format(report?.arrived_date, 'dd-MM-yyy') === format(travel?.from_date, 'dd-MM-yyy') ? (
-                                  <>
-                                  {format(report?.arrived_date, 'H:mm')}
-                                  </>
-                                ) : (
-                                  '-----'
-                                )}
-                                <br />
-                              </span>
-                            ) )}
-                          </td>
-                          <td className='border'>
-                            {travel?.hrs_out_of_hq}
-                          </td>
-                          <td className='border'>
-                            {travel?.hrs_out_of_hq > "12:00" ? '100%' : (travel?.hrs_out_of_hq > "6:00" || travel?.hrs_out_of_hq <= "12:00"  ? '70%' : (travel?.hrs_out_of_hq <= "6:00" ? '30%' : '0%'))}
-                          </td>
-                          <td className='border'>
-                            {travel?.hrs_out_of_hq > "12:00" ? '1000' : (travel?.hrs_out_of_hq > "6:00" || travel?.hrs_out_of_hq <= "12:00"  ? '700' : (travel?.hrs_out_of_hq <= "6:00" ? '300' : '0'))}
-                          </td>
-                          <td className='border'>
-                            0
-                          </td>
-                          {index == 0 && (
-                          <td rowSpan={data?.length} className='border [writing-mode:sideways-lr]'>
-                            Check Tickets in Running Train {travel?.length}
-                          </td>
-                          )}
-                        </tr>
-                      </React.Fragment>
+                    {data?.length > 0 && data?.map((report, index) => (
+                      <tr key={index}>
+                        <td className="border pli-2 plb-0.5">{report?.date}</td>
+                        <td className="border pli-2 plb-0.5">{report?.train_no}</td>
+                        <td className="border pli-2 plb-0.5">{report?.from_station}</td>
+                        <td className="border pli-2 plb-0.5">{report?.to_station}</td>
+                        <td className="border pli-2 plb-0.5">{report?.shift_employed_from}</td>
+                        <td className="border pli-2 plb-0.5">{report?.shift_employed_to}</td>
+                        <td className="border pli-2 plb-0.5">{report?.adjusted_sign_on}</td>
+                        <td className="border pli-2 plb-0.5">{report?.adjusted_sign_off}</td>
+                        <td className="border pli-2 plb-0.5">{report?.night_duty_from}</td>
+                        <td className="border pli-2 plb-0.5">{report?.night_duty_to} {report?.next_day ? <><br />{report?.next_day}</> : null}</td>
+                        <td className="border pli-2 plb-0.5">{report?.total_hours}</td>
+                        <td className="border pli-2 plb-0.5">{report?.weighted_hrs}</td>
+                      </tr>
                     ))}
-                      */}
-                      {data?.length > 0 && data.map((travel, index) => {
-                        const fromDateStr = format(travel?.from_date, 'dd-MM-yyyy');
-
-                        // Helper: Format each field for all travel_data
-                        const trainNos = travel?.travel_data?.map((r, i) => (
-                          <span key={`train-${i}`}>{r?.train?.train_no}<br /></span>
-                        ));
-
-                        const fromStations = travel?.travel_data?.map((r, i) => (
-                          <span key={`from-${i}`}>
-                            {format(r?.from_date, 'dd-MM-yyyy') === fromDateStr ? r?.from_station?.station_code : '-----'}
-                            <br />
-                          </span>
-                        ));
-
-                        const toStations = travel?.travel_data?.map((r, i) => (
-                          <span key={`to-${i}`}>
-                            {format(r?.arrived_date, 'dd-MM-yyyy') === fromDateStr ? r?.to_station?.station_code : '-----'}
-                            <br />
-                          </span>
-                        ));
-
-                        const depTimes = travel?.travel_data?.map((r, i) => (
-                          <span key={`dep-${i}`}>
-                            {format(r?.from_date, 'dd-MM-yyyy') === fromDateStr ? format(r?.from_date, 'H:mm') : '-----'}
-                            <br />
-                          </span>
-                        ));
-
-                        const arrTimes = travel?.travel_data?.map((r, i) => (
-                          <span key={`arr-${i}`}>
-                            {format(r?.arrived_date, 'dd-MM-yyyy') === fromDateStr ? format(r?.arrived_date, 'H:mm') : '-----'}
-                            <br />
-                          </span>
-                        ));
-
-                        // Determine %AGE and amount
-                        // const hours = travel?.hrs_out_of_hq || "0";
-                        // let percentage = "0%";
-                        // let amount = "0";
-
-                        // if (hours > "12:00") {
-                        //   percentage = "100%";
-                        //   amount = "1000 "+ hours;
-                        // } else if (hours > "06:00") {
-                        //   percentage = "70%";
-                        //   amount = "700 " + hours;
-                        // } else if (hours > "0") {
-                        //   percentage = "30%";
-                        //   amount = "300";
-                        // }
-
-                        if(travel?.is_in_month){
-
-                          return (
-                            <tr key={index}>
-                              <td className="border pli-2 plb-0.5">{fromDateStr}</td>
-                              <td className="border pli-2 plb-0.5">{trainNos}</td>
-                              <td className="border pli-2 plb-0.5">{fromStations}</td>
-                              <td className="border pli-2 plb-0.5">{toStations}</td>
-                              <td className="border pli-2 plb-0.5">{depTimes}</td>
-                              <td className="border pli-2 plb-0.5">{arrTimes}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.hrs_out_of_hq}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.percentage}%</td>
-                              <td className="border pli-2 plb-0.5">{travel?.amount?.rs}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.amount?.p}</td>
-                              {index === 0 && (
-                                <td rowSpan={data?.length + 1} className={`rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
-                                  Check Tickets in Running Train
-                                </td>
-                              )}
-                            </tr>
-                          );
-                        }
-
-                      })}
-                      {data?.length > 0 ?
-                        <tr>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'></td>
-                          <td className='border'><strong>TOTAL</strong></td>
-                          <td className='border'><strong>{totalAmount && parseInt(totalAmount)}</strong></td>
-                          <td className='border'><strong>{totalAmount && +(totalAmount - Math.floor(totalAmount)).toFixed(2)}</strong></td>
-                        </tr>
-                        :
-                        <tr>
-                          <td colSpan={12} className='border'>No Data Found</td>
-                        </tr>
-                      }
-
+                    {data?.length > 0 ?
+                      <tr>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border'></td>
+                        <td className='border' colSpan={2}><strong>TOTAL</strong></td>
+                        <td className='border'><strong>{totalHours}</strong></td>
+                        <td className='border'></td>
+                      </tr>
+                      :
+                      <tr>
+                        <td colSpan={12} className='border'>No Data Found</td>
+                      </tr>
+                    }
                   </tbody>
                 </table>
-
               </div>
             </Grid>
-            {/* <Grid size={{ xs: 12 }}>
-              <div className='overflow-x-auto'>
-                <table ref={tableRef} className={`${tableStyles.table} text-center`}>
-                  <thead>
-                    <tr>
-                      <th colSpan={4} className='border text-center text-[15px]'>MOVEMENT REPORT FOR THE MONTH OF {String(month.toLocaleDateString('en-US', { month: 'long'})).toUpperCase()} {month.toLocaleDateString('en-us', {year: 'numeric' })}</th>
-                    </tr>
-                    <tr>
-                      <th rowSpan={2} className='border text-center uppercase'>DATE</th>
-                      <th rowSpan={2} className='border text-center'>TRAIN NO.</th>
-                      <th colSpan={2} className='border text-center'>STATION</th>
-                    </tr>
-                    <tr>
-                      <th className='border text-center'>FROM</th>
-                      <th className='border text-center'>TO</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data?.length > 0 ? data?.map((travel, index) => (
-                      <tr key={index}>
-                        <td className='border'>{travel.date}</td>
-                        <td className='border'>{travel.type == 'travel' && travel.trains}</td>
-                        <td className='border' colSpan={2}>{travel.type == 'leave' ? travel.leave_purpose.toUpperCase() : travel.stations}</td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={4} className='border'>No Data</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </Grid> */}
           </Grid>
         </CardContent>
       </Card>
