@@ -37,6 +37,7 @@ const TravelingAllowanceReport = () => {
   const token = session?.user?.token
 
   const [data, setData] = useState([]);
+  const [user, setUser] = useState();
   const [totalAmount, setTotalAmount] = useState();
   const [month, setMonth] = useState(new Date())
   const tableRef = useRef(null);
@@ -60,8 +61,10 @@ const TravelingAllowanceReport = () => {
       if (response.status === 200) {
         setTotalAmount(jsonData.total_amount);
         setData(jsonData.data);
+        setUser(jsonData.user);
       } else {
         setData([]);
+        setUser();
       }
 
       console.log('jsonData', jsonData);
@@ -76,6 +79,7 @@ const TravelingAllowanceReport = () => {
       console.error('Error fetching data:', error);
 
       setData([]);
+      setUser();
     }
   };
 
@@ -95,6 +99,11 @@ const TravelingAllowanceReport = () => {
   }
 
   const exportTableToPDF = () => {
+
+    window.print();
+
+    return
+    
     const doc = new jsPDF()
 
     autoTable(doc, {
@@ -161,7 +170,32 @@ const TravelingAllowanceReport = () => {
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <div className='overflow-x-auto'>
+              <div className='overflow-x-auto print-area'>
+                <div className='relative'>
+                  <div className='absolute left-0 right-0'>
+                    <div className='flex justify-between'>
+                      <div className='flex gap-10'>
+                        <div>उ. रे./N.R</div>
+                        <div>
+                          <img src='/images/logos/IRCTC-logo.png' width='50' height='50' />
+                        </div>
+                      </div>
+                      <div className=''>
+                        <div>जी. ए. 31/ एस. आर . सी ./ जी.-1677</div>
+                        <div><strong className='flex justify-end text-end'>G.A 31/S.R.C/G-1677<br />जी. 6/G-6</strong></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='text-center'>यात्रा भत्ता विवरण</div>
+                  <div className='text-center mb-6'><strong>TRAVELLING ALLOWANCE JOURNAL</strong></div>
+                </div>
+                <div className='ta-detail'>
+                  Branch <strong className='underline'> {user?.branch?.branch_name} </strong> Division <strong className='underline'>{user?.division.division_name}</strong> Hd. Qrs . <strong className='underline'>{user?.station_head_quarter?.station_name}</strong> Journal of duties performed by
+                  Sh. <strong className='underline'>{ user?.first_name +" "+ user?.last_name}</strong> S/o <strong className='underline'>{user?.father_name}</strong> For which allowance for <strong className='underline uppercase'>{format(month, 'MMM-yyyy')}</strong> is claimed
+                  P.F. No. <strong className='underline'>{user?.pf_no}</strong> Designation <strong className='underline'>{user?.designation?.designation_name}</strong> Pay Band <strong className='underline'>{user?.pay_band}</strong> G.Pay <strong className='underline'>{user?.g_pay}</strong> Pay <strong className='underline'>{user?.pay || "-"}.</strong>
+                  DOB <strong className='underline'>{user?.date_of_birth && format(user.date_of_birth, 'dd-MM-yyyy')}</strong> DOA <strong className='underline'>{user?.date_of_joining && format(user.date_of_joining, 'dd-MM-yyyy')}</strong> Checking Authority No. <strong className='underline'>{user?.authority_no}</strong> Valid upto <strong className='underline'>{user?.expiry_date && format(user.expiry_date, 'dd-MM-yyyy')}.</strong>
+                  1st class duty card pass No. <strong className='underline'>{user?.first_class_duty_pass_no}</strong> Valid upto <strong className='underline'> 09-09-2025 </strong>TA list Sr. No. <strong className='underline'>{user?.ta_sr_no}.</strong>
+                </div>
                 <table ref={tableRef} className={` table-auto w-full border-collapse text-center`}>
                   <thead>
                     <tr>
@@ -400,7 +434,12 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5">{travel?.amount?.rs}</td>
                               <td className="border pli-2 plb-0.5">{travel?.amount?.p}</td>
                               {index === 0 && (
-                                <td rowSpan={data?.length + 1} className={`rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
+                                <td rowSpan={19} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
+                                  Check Tickets in Running Train
+                                </td>
+                              )}
+                              {index === 19 && (
+                                <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}

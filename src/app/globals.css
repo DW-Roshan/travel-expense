@@ -131,3 +131,77 @@ code {
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
 }
+
+
+@media print {
+
+  * {
+
+    font-family: 'Times New Roman', Times, serif;
+    color: black;
+    font-size: 16px;
+  }
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything except the card */
+  body * {
+    visibility: hidden !important;
+  }
+
+  .ta-detail, .ta-detail * {
+    font-size: 18px;
+  }
+
+  .print-area, .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  /* Page break on table overflow */
+  table {
+    page-break-inside: auto;
+  }
+
+  table * {
+
+    font-size: 14px;
+  }
+
+  table > thead  th  {
+    font-size: 16px;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th, td {
+    border: 1px solid #000 !important;
+    padding: 1px 8px !important;
+  }
+
+  /* Vertical text support */
+  .vertical-text {
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    white-space: nowrap;
+  }
+
+  .repeat-on-each-page {
+    display: table-cell !important;
+  }
+
+   thead.repeating-header {
+    display: table-header-group !important;
+  }
+}
