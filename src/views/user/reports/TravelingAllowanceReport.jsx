@@ -40,7 +40,12 @@ const TravelingAllowanceReport = () => {
   const [user, setUser] = useState();
   const [totalAmount, setTotalAmount] = useState();
   const [month, setMonth] = useState(new Date())
+  const [percentages, setPercentages] = useState();
   const tableRef = useRef(null);
+
+  useEffect(() => {
+    console.log('percentages', percentages);
+  }, [percentages])
 
   const fetchData = async (date) => {
     // const token = await getCookie('token');
@@ -62,9 +67,11 @@ const TravelingAllowanceReport = () => {
         setTotalAmount(jsonData.total_amount);
         setData(jsonData.data);
         setUser(jsonData.user);
+        setPercentages(jsonData.percent_counts);
       } else {
         setData([]);
         setUser();
+        setPercentages();
       }
 
       console.log('jsonData', jsonData);
@@ -80,6 +87,7 @@ const TravelingAllowanceReport = () => {
 
       setData([]);
       setUser();
+      setPercentages();
     }
   };
 
@@ -190,9 +198,9 @@ const TravelingAllowanceReport = () => {
                   <div className='text-center mb-6'><strong>TRAVELLING ALLOWANCE JOURNAL</strong></div>
                 </div>
                 <div className='ta-detail'>
-                  Branch <strong className='underline'> {user?.branch?.branch_name} </strong> Division <strong className='underline'>{user?.division.division_name}</strong> Hd. Qrs . <strong className='underline'>{user?.station_head_quarter?.station_name}</strong> Journal of duties performed by
+                  Branch <strong className='underline'> {user?.branch?.branch_name} </strong> Division <strong className='underline'>{user?.division?.division_name}</strong> Hd. Qrs . <strong className='underline'>{user?.station_head_quarter?.station_name}</strong> Journal of duties performed by
                   Sh. <strong className='underline'>{ user?.first_name +" "+ user?.last_name}</strong> S/o <strong className='underline'>{user?.father_name}</strong> For which allowance for <strong className='underline uppercase'>{format(month, 'MMM-yyyy')}</strong> is claimed
-                  P.F. No. <strong className='underline'>{user?.pf_no}</strong> Designation <strong className='underline'>{user?.designation?.designation_name}</strong> Pay Band <strong className='underline'>{user?.pay_band}</strong> G.Pay <strong className='underline'>{user?.g_pay}</strong> Pay <strong className='underline'>{user?.pay || "-"}.</strong>
+                  P.F. No. <strong className='underline'>{user?.pf_no}</strong> Designation <strong className='underline'>{user?.designation?.designation_name}</strong> Pay Band <strong className='underline'>{user?.pay_band}</strong> G.Pay <strong className='underline'>{user?.g_pay}</strong> Pay <strong className='underline'>{user?.pay || "4200"}.</strong>
                   DOB <strong className='underline'>{user?.date_of_birth && format(user.date_of_birth, 'dd-MM-yyyy')}</strong> DOA <strong className='underline'>{user?.date_of_joining && format(user.date_of_joining, 'dd-MM-yyyy')}</strong> Checking Authority No. <strong className='underline'>{user?.authority_no}</strong> Valid upto <strong className='underline'>{user?.expiry_date && format(user.expiry_date, 'dd-MM-yyyy')}.</strong>
                   1st class duty card pass No. <strong className='underline'>{user?.first_class_duty_pass_no}</strong> Valid upto <strong className='underline'> 09-09-2025 </strong>TA list Sr. No. <strong className='underline'>{user?.ta_sr_no}.</strong>
                 </div>
@@ -371,32 +379,32 @@ const TravelingAllowanceReport = () => {
 
                         // Helper: Format each field for all travel_data
                         const trainNos = travel?.travel_data?.map((r, i) => (
-                          <span key={`train-${i}`}>{r?.train?.train_no}<br /></span>
+                          <span key={`train-${i}`} className='text-nowrap whitespace-nowrap'>{r?.train?.train_no}<br /></span>
                         ));
 
                         const fromStations = travel?.travel_data?.map((r, i) => (
-                          <span key={`from-${i}`}>
+                          <span key={`from-${i}`} className='text-nowrap whitespace-nowrap'>
                             {format(r?.from_date, 'dd-MM-yyyy') === fromDateStr ? r?.from_station?.station_code : '-----'}
                             <br />
                           </span>
                         ));
 
                         const toStations = travel?.travel_data?.map((r, i) => (
-                          <span key={`to-${i}`}>
+                          <span key={`to-${i}`} className='text-nowrap whitespace-nowrap'>
                             {format(r?.arrived_date, 'dd-MM-yyyy') === fromDateStr ? r?.to_station?.station_code : '-----'}
                             <br />
                           </span>
                         ));
 
                         const depTimes = travel?.travel_data?.map((r, i) => (
-                          <span key={`dep-${i}`}>
+                          <span key={`dep-${i}`} className='text-nowrap whitespace-nowrap'>
                             {format(r?.from_date, 'dd-MM-yyyy') === fromDateStr ? format(r?.from_date, 'H:mm') : '-----'}
                             <br />
                           </span>
                         ));
 
                         const arrTimes = travel?.travel_data?.map((r, i) => (
-                          <span key={`arr-${i}`}>
+                          <span key={`arr-${i}`} className='text-nowrap whitespace-nowrap'>
                             {format(r?.arrived_date, 'dd-MM-yyyy') === fromDateStr ? format(r?.arrived_date, 'H:mm') : '-----'}
                             <br />
                           </span>
@@ -422,24 +430,24 @@ const TravelingAllowanceReport = () => {
 
                           return (
                             <tr key={index}>
-                              {/* <td className="border pli-2 plb-0.5">{index + 1}.</td> */}
-                              <td className="border pli-2 plb-0.5">{fromDateStr}</td>
-                              <td className="border pli-2 plb-0.5">{trainNos}</td>
-                              <td className="border pli-2 plb-0.5">{fromStations}</td>
-                              <td className="border pli-2 plb-0.5">{toStations}</td>
-                              <td className="border pli-2 plb-0.5">{depTimes}</td>
-                              <td className="border pli-2 plb-0.5">{arrTimes}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.hrs_out_of_hq}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.percentage}%</td>
-                              <td className="border pli-2 plb-0.5">{travel?.amount?.rs}</td>
-                              <td className="border pli-2 plb-0.5">{travel?.amount?.p}</td>
+                              {/* <td className="border pli-2 plb-0.5 ">{index + 1}.</td> */}
+                              <td className="border pli-2 plb-0.5 ">{fromDateStr}</td>
+                              <td className="border pli-2 plb-0.5 ">{trainNos}</td>
+                              <td className="border pli-2 plb-0.5 ">{fromStations}</td>
+                              <td className="border pli-2 plb-0.5 ">{toStations}</td>
+                              <td className="border pli-2 plb-0.5 ">{depTimes}</td>
+                              <td className="border pli-2 plb-0.5 ">{arrTimes}</td>
+                              <td className="border pli-2 plb-0.5 ">{travel?.hrs_out_of_hq}</td>
+                              <td className="border pli-2 plb-0.5 ">{travel?.percentage}%</td>
+                              <td className="border pli-2 plb-0.5 ">{travel?.amount?.rs}</td>
+                              <td className="border pli-2 plb-0.5 ">{travel?.amount?.p}</td>
                               {index === 0 && (
-                                <td rowSpan={19} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
+                                <td rowSpan={25} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}
-                              {index === 19 && (
-                                <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5 [writing-mode:vertical-lr] [text-orientation:mixed]`} style={{ writingMode: 'vertical-lr' }}>
+                              {index === 25 && (
+                                <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}
@@ -466,10 +474,121 @@ const TravelingAllowanceReport = () => {
                           <td colSpan={11} className='border'>No Data Found</td>
                         </tr>
                       }
-
+                      {data?.length > 0 &&<>
+                        <tr>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'></td>
+                          <td className='border'><strong>B/F</strong></td>
+                          <td className='border'><strong>{totalAmount && parseInt(totalAmount)}</strong></td>
+                          <td className='border'><strong>{totalAmount && +(totalAmount - Math.floor(totalAmount)).toFixed(2)}</strong></td>
+                          <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed] text-lg`} style={{ writingMode: 'sideways-lr' }}>
+                            Check Tickets in Running Train
+                          </td>
+                        </tr>
+                        {Array.from({ length: 6 }).map((_, i) => {
+                          return (
+                            <tr key={`bf-row-${i}`}>
+                              <td className='border h-6'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                              <td className='border'></td>
+                            </tr>
+                          )
+                        })}
+                        <tr style={{ border: 0 }}>
+                          <td colSpan={7} style={{ border: 0 }}></td>
+                          <td colSpan={2} style={{ border: 0 }}>
+                            <div className='text-end  text-lg whitespace-nowrap' style={{ fontFamily: 'sans-serif', fontWeight: 'bold' }}>Total= {totalAmount}</div>
+                          </td>
+                          <td colSpan={2} style={{ border: 0 }}></td>
+                        </tr>
+                        </>
+                      }
                   </tbody>
                 </table>
+                <div><strong style={{ fontFamily: 'sans-serif' }}>SUMMARY OF TA CLAIMED</strong></div>
+                <div className='flex'>
+                  <div>
+                    <div>100% = 1000 x {percentages?.['100'] < 10 ? '0'+percentages?.['100'] : percentages?.['100']} = {percentages?.['100'] * 1000}</div>
 
+                    <div>070% = 700 x {percentages?.['70'] < 10 ? '0'+percentages?.['70'] : percentages?.['70']} = {percentages?.['70'] * 700}</div>
+
+                    <div>030% = 300 x {percentages?.['30'] < 10 ? '0'+percentages?.['30'] : percentages?.['30']} = {percentages?.['30'] * 300}</div>
+                    <div className='text-end'><span className='text-lg'>Total</span> = <span style={{ borderBlock: '1px solid #000'  }}>{totalAmount}</span></div>
+                  </div>
+                  <img src='/images/logos/curly-bracket.png' height="62px"/>
+                  <div>
+                    <div>Rs. Nineteen Thousands Eight Hundred Only</div>
+                    <table className={`ml-2 mt-2 table-auto w-full border-collapse text-center earning-figures`}>
+                      <tbody>
+                        <tr>
+                          <td rowSpan={3} className='border font-bold default-font'>Earning<br/>Figures</td>
+                          <td colSpan={2} className='border font-bold'>PENALTY</td>
+                          <td colSpan={2} className='border font-bold'>NON PENALTY</td>
+                          <td colSpan={2} className='border font-bold'>TOTAL</td>
+                        </tr>
+                        <tr>
+                          <td className='border font-bold'>CASES</td>
+                          <td className='border font-bold'>Amt.</td>
+                          <td className='border font-bold'>CASES</td>
+                          <td className='border font-bold'>Amt.</td>
+                          <td className='border font-bold'>CASES</td>
+                          <td className='border font-bold'>Amt.</td>
+                        </tr>
+                        <tr>
+                          <td className='border font-bold'>33</td>
+                          <td className='border font-bold'>36290</td>
+                          <td className='border font-bold'>03</td>
+                          <td className='border font-bold'>1450</td>
+                          <td className='border font-bold'>36</td>
+                          <td className='border font-bold'>37740</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className='mt-2'>
+                  <div><span>प्रमाणित किया जाता है कि/</span><span>It is certified that -</span></div>
+                  <ol className='ml-5'>
+                    <li>
+                      जो यात्रा भत्ता मैंने मांगा है वह न तो पहले मांगा गया था और न ही आगे मांगा जाएगा ।
+                      <br />
+                      The T.A. claimed by me has not been claimed before & will not be claimed hereafter. 
+                    </li>
+                    <li>
+                      जो सावरी प्रभार मैंने मांगे हैं, वे वास्तव में मैंने खर्च किए हैं और स्थानीय नगरपालिका की दरों के अनुसार हैं ।
+                      <br />
+                      Conveyance charges claimed have actually been spent by me and according to local Municipal rates.
+                    </li>
+                    <li>
+                      सबसे सस्ती सवारी का उपयोग किया गया था / Cheapest mode of conveyance was utilized.
+                    </li>
+                    <li>
+                      जिस सड़क यात्रा के लिए सवारी प्रभार मांगे गए थे उनकी दर 1.6 कि. मी. से अधिक थी ।
+                      <br />
+                      The journey performed by road for which conveyance have been claimed was over 1.6 K.M.
+                    </li>
+                  </ol>
+                </div>
+                <div className='ml-auto mr-5 mt-[40px] w-fit text-center'>
+                  <div className='pl-3 pr-3 pt-1' style={{ borderTop: "1px solid #000" }}>
+                    यात्रा भत्ता लेने वाले अधिकारी के हस्ताक्षर
+                  </div>
+                  <div className='font-bold'>Signature of Officer Claiming T.A.</div>
+                </div>
+                <div style={{ fontSize: "12px" }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;मैं प्रमाणित करता हूँ कि श्री<span className='w-[100px] inline-block' style={{ borderBottom: "1px solid #000" }}></span> बिल में दिए समय के लए रेलवे के काम से सदर मुकाम स्टेशन से बाहर गये थे . उहने रेल /जहाज 
+/हवाई जहाज से या ा क ह उसके  लए सरकार थानीय न ध मु त टकट दया गया /नहं दया गया /मु त सवार द गई /नहं द गई I </div>
               </div>
             </Grid>
             {/* <Grid size={{ xs: 12 }}>
