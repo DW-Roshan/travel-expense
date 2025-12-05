@@ -208,4 +208,14 @@ code {
    thead.repeating-header {
     display: table-header-group !important;
   }
+
+  @page:first {
+    /* Create a footer area */
+    /* margin-bottom: 40m; */
+
+    @bottom-right {
+      content: "P.T.O";
+      font-size: 12pt;
+    }
+  }
 }

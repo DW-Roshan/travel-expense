@@ -39,6 +39,7 @@ const TravelingAllowanceReport = () => {
   const [data, setData] = useState([]);
   const [user, setUser] = useState();
   const [totalAmount, setTotalAmount] = useState();
+  const [totalAmountInWords, setTotalAmountInWords] = useState();
   const [month, setMonth] = useState(new Date())
   const [percentages, setPercentages] = useState();
   const tableRef = useRef(null);
@@ -65,6 +66,7 @@ const TravelingAllowanceReport = () => {
 
       if (response.status === 200) {
         setTotalAmount(jsonData.total_amount);
+        setTotalAmountInWords(jsonData.total_in_words);
         setData(jsonData.data);
         setUser(jsonData.user);
         setPercentages(jsonData.percent_counts);
@@ -111,7 +113,7 @@ const TravelingAllowanceReport = () => {
     window.print();
 
     return
-    
+
     const doc = new jsPDF()
 
     autoTable(doc, {
@@ -200,8 +202,7 @@ const TravelingAllowanceReport = () => {
                 <div className='ta-detail'>
                   Branch <strong className='underline'> {user?.branch?.branch_name} </strong> Division <strong className='underline'>{user?.division?.division_name}</strong> Hd. Qrs . <strong className='underline'>{user?.station_head_quarter?.station_name}</strong> Journal of duties performed by
                   Sh. <strong className='underline'>{ user?.first_name +" "+ user?.last_name}</strong> S/o <strong className='underline'>{user?.father_name}</strong> For which allowance for <strong className='underline uppercase'>{format(month, 'MMM-yyyy')}</strong> is claimed
-                  P.F. No. <strong className='underline'>{user?.pf_no}</strong> Designation <strong className='underline'>{user?.designation?.designation_name}</strong> Pay Band <strong className='underline'>{user?.pay_band}</strong> G.Pay <strong className='underline'>{user?.g_pay}</strong> Pay <strong className='underline'>{user?.pay || "4200"}.</strong>
-                  DOB <strong className='underline'>{user?.date_of_birth && format(user.date_of_birth, 'dd-MM-yyyy')}</strong> DOA <strong className='underline'>{user?.date_of_joining && format(user.date_of_joining, 'dd-MM-yyyy')}</strong> Checking Authority No. <strong className='underline'>{user?.authority_no}</strong> Valid upto <strong className='underline'>{user?.expiry_date && format(user.expiry_date, 'dd-MM-yyyy')}.</strong>
+                  P.F. No. <strong className='underline'>{user?.pf_no}</strong> Designation <strong className='underline'>{user?.designation?.designation_name}</strong> Pay Band <strong className='underline'>{user?.pay_band}</strong> G.Pay <strong className='underline'>{user?.g_pay}</strong> Pay <strong className='underline'>{user?.pay || "4200"}.</strong> DOB <strong className='underline'>{user?.date_of_birth && format(user.date_of_birth, 'dd-MM-yyyy')}</strong> DOA <strong className='underline'>{user?.date_of_joining && format(user.date_of_joining, 'dd-MM-yyyy')}</strong> Checking Authority No. <strong className='underline'>{user?.authority_no}</strong> Valid upto <strong className='underline'>{user?.expiry_date && format(user.expiry_date, 'dd-MM-yyyy')}.</strong>
                   1st class duty card pass No. <strong className='underline'>{user?.first_class_duty_pass_no}</strong> Valid upto <strong className='underline'> 09-09-2025 </strong>TA list Sr. No. <strong className='underline'>{user?.ta_sr_no}.</strong>
                 </div>
                 <table ref={tableRef} className={` table-auto w-full border-collapse text-center`}>
@@ -442,7 +443,7 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.rs}</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.p}</td>
                               {index === 0 && (
-                                <td rowSpan={25} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
+                                <td rowSpan={data.length >= 25 ? 25 + 1 : (data.length + 7 >= 26 ? 26 : data.length + 7)} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}
@@ -475,6 +476,7 @@ const TravelingAllowanceReport = () => {
                         </tr>
                       }
                       {data?.length > 0 &&<>
+                        {data.length + 8 > 25 &&
                         <tr>
                           <td className='border'></td>
                           <td className='border'></td>
@@ -487,9 +489,10 @@ const TravelingAllowanceReport = () => {
                           <td className='border'><strong>{totalAmount && parseInt(totalAmount)}</strong></td>
                           <td className='border'><strong>{totalAmount && +(totalAmount - Math.floor(totalAmount)).toFixed(2)}</strong></td>
                           <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed] text-lg`} style={{ writingMode: 'sideways-lr' }}>
-                            Check Tickets in Running Train
+                            <div>Check Tickets in <br/> Running Train</div>
                           </td>
                         </tr>
+                        }
                         {Array.from({ length: 6 }).map((_, i) => {
                           return (
                             <tr key={`bf-row-${i}`}>
@@ -529,7 +532,7 @@ const TravelingAllowanceReport = () => {
                   </div>
                   <img src='/images/logos/curly-bracket.png' height="62px"/>
                   <div>
-                    <div>Rs. Nineteen Thousands Eight Hundred Only</div>
+                    <div className='capitalize'>Rs. {totalAmountInWords} Only</div>
                     <table className={`ml-2 mt-2 table-auto w-full border-collapse text-center earning-figures`}>
                       <tbody>
                         <tr>
@@ -559,22 +562,22 @@ const TravelingAllowanceReport = () => {
                   </div>
                 </div>
                 <div className='mt-2'>
-                  <div><span>प्रमाणित किया जाता है कि/</span><span>It is certified that -</span></div>
+                  <div style={{ fontSize: '13px' }}><span style={{ fontSize: '13px' }}>प्रमाणित किया जाता है कि/</span><span>It is certified that -</span></div>
                   <ol className='ml-5'>
-                    <li>
+                    <li style={{ fontSize: '13px' }}>
                       जो यात्रा भत्ता मैंने मांगा है वह न तो पहले मांगा गया था और न ही आगे मांगा जाएगा ।
                       <br />
-                      The T.A. claimed by me has not been claimed before & will not be claimed hereafter. 
+                      The T.A. claimed by me has not been claimed before & will not be claimed hereafter.
                     </li>
-                    <li>
+                    <li style={{ fontSize: '13px' }}>
                       जो सावरी प्रभार मैंने मांगे हैं, वे वास्तव में मैंने खर्च किए हैं और स्थानीय नगरपालिका की दरों के अनुसार हैं ।
                       <br />
                       Conveyance charges claimed have actually been spent by me and according to local Municipal rates.
                     </li>
-                    <li>
+                    <li style={{ fontSize: '13px' }}>
                       सबसे सस्ती सवारी का उपयोग किया गया था / Cheapest mode of conveyance was utilized.
                     </li>
-                    <li>
+                    <li style={{ fontSize: '13px' }}>
                       जिस सड़क यात्रा के लिए सवारी प्रभार मांगे गए थे उनकी दर 1.6 कि. मी. से अधिक थी ।
                       <br />
                       The journey performed by road for which conveyance have been claimed was over 1.6 K.M.
@@ -582,48 +585,40 @@ const TravelingAllowanceReport = () => {
                   </ol>
                 </div>
                 <div className='ml-auto mr-5 mt-[40px] w-fit text-center'>
-                  <div className='pl-3 pr-3 pt-1' style={{ borderTop: "1px solid #000" }}>
+                  <div className='pl-3 pr-3 pt-1' style={{ borderTop: "1px solid #000", fontSize: '13px' }}>
                     यात्रा भत्ता लेने वाले अधिकारी के हस्ताक्षर
                   </div>
-                  <div className='font-bold'>Signature of Officer Claiming T.A.</div>
+                  <div className='font-bold' style={{ fontSize: '13px' }}>Signature of Officer Claiming T.A.</div>
                 </div>
-                <div style={{ fontSize: "12px" }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;मैं प्रमाणित करता हूँ कि श्री<span className='w-[100px] inline-block' style={{ borderBottom: "1px solid #000" }}></span> बिल में दिए समय के लए रेलवे के काम से सदर मुकाम स्टेशन से बाहर गये थे . उहने रेल /जहाज 
-/हवाई जहाज से या ा क ह उसके  लए सरकार थानीय न ध मु त टकट दया गया /नहं दया गया /मु त सवार द गई /नहं द गई I </div>
+                <div className='mt-4' style={{ fontSize: "13px" }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;मैं प्रमाणित करता हूँ कि श्री<span className='w-[60px] inline-block' style={{ borderBottom: "1px solid #000" }}></span> बिल में दिए समय के लए रेलवे के काम से सदर मुकाम स्टेशन से बाहर गये थे . उन्होंने रेल /जहाज
+/हवाई जहाज से यात्रा की हैं उसके लिए सरकारी स्थानीय निधि मुफ्त टिकट दिया गया /नहीं दिया गया /मुफ्त सवारी दी गई /नहीं दी गई । </div>
+                <div style={{ fontSize: "13px" }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I hereby certify that Shri <span className='w-[60px] inline-block' style={{ borderBottom: "1px solid #000" }}></span> was absent on duty from his headquarters station during the period charges for in the bill on
+Railway business and that the offer performed the journey by Rail/Sea/Air/Road and was allowed/not allowed free pass of locomotion at the
+express of Government local fund of Indian State.</div>
+                <div className='mt-2' style={{ fontSize: '13px' }}>
+                  प्रति हस्ताक्षर/Countersigned
+                </div>
+                <div className='ml-auto mr-5 mt-[30px] w-fit text-center'>
+                  <div className='pl-3 pr-3 pt-1' style={{ borderTop: "1px solid #000", fontSize: '13px' }}>
+                    कार्यालय के प्रधान के हस्ताक्षर
+                  </div>
+                  <div className='font-bold' style={{ fontSize: '13px' }}>Signature of Head of the Office</div>
+                </div>
+                <div className='w-fit mb-2'>
+                  <div style={{ fontSize: '13px' }}>नियंत्रक अधिकारी /Controlling Officer</div>
+                </div>
+                <div>
+                  <ol className='ml-5'>
+                    <li style={{ fontSize: '13px' }}>
+                      एक रेलवे से दूसरी रेलवे पर बदली होने पर यात्रा भत्ता मांगा जाय उस समय बिल में यह स्पष्ट लिख देना चाहिए कि सरकार की ओर से यात्रा के लिए
+मुफ्त टिकट दिया गया या नहीं दिया गया / मुफ्त सवारी दी गई या नहीं दी गई ।
+                      <br />
+                      On T.A. Bills of transfer from one-Railway to another a certificate whether or not a free Pass or locomotion at Government express was
+ allowed should be recorded.</li>
+                  </ol>
+                </div>
               </div>
             </Grid>
-            {/* <Grid size={{ xs: 12 }}>
-              <div className='overflow-x-auto'>
-                <table ref={tableRef} className={`${tableStyles.table} text-center`}>
-                  <thead>
-                    <tr>
-                      <th colSpan={4} className='border text-center text-[15px]'>MOVEMENT REPORT FOR THE MONTH OF {String(month.toLocaleDateString('en-US', { month: 'long'})).toUpperCase()} {month.toLocaleDateString('en-us', {year: 'numeric' })}</th>
-                    </tr>
-                    <tr>
-                      <th rowSpan={2} className='border text-center uppercase'>DATE</th>
-                      <th rowSpan={2} className='border text-center'>TRAIN NO.</th>
-                      <th colSpan={2} className='border text-center'>STATION</th>
-                    </tr>
-                    <tr>
-                      <th className='border text-center'>FROM</th>
-                      <th className='border text-center'>TO</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data?.length > 0 ? data?.map((travel, index) => (
-                      <tr key={index}>
-                        <td className='border'>{travel.date}</td>
-                        <td className='border'>{travel.type == 'travel' && travel.trains}</td>
-                        <td className='border' colSpan={2}>{travel.type == 'leave' ? travel.leave_purpose.toUpperCase() : travel.stations}</td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={4} className='border'>No Data</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </Grid> */}
           </Grid>
         </CardContent>
       </Card>
