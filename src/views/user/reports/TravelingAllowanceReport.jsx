@@ -443,7 +443,7 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.rs}</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.p}</td>
                               {index === 0 && (
-                                <td rowSpan={data.length >= 25 ? 25 + 1 : (data.length + 7 >= 26 ? 26 : data.length + 7)} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
+                                <td rowSpan={data.length >= 19 ? 26 : data.length + 7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
                               )}
