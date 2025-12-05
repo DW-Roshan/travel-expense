@@ -376,6 +376,7 @@ const TravelingAllowanceReport = () => {
                     ))}
                       */}
                       {data?.length > 0 && data.map((travel, index) => {
+                        const ROWS_PER_PAGE = 25;
                         const fromDateStr = format(travel?.from_date, 'dd-MM-yyyy');
 
                         // Helper: Format each field for all travel_data
@@ -442,7 +443,16 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5 ">{travel?.percentage}%</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.rs}</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.p}</td>
-                              {index === 0 && (
+                              {(index === 0 || index === 25 || index === 50) && (
+                                <td
+                                  rowSpan={ROWS_PER_PAGE - (index % ROWS_PER_PAGE)}
+                                  className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`}
+                                  style={{ writingMode: 'sideways-lr' }}
+                                >
+                                  Check Tickets in Running Train
+                                </td>
+                              )}
+                              {/* {index === 0 && (
                                 <td rowSpan={data.length >= 25 ? 25 + 1 : data.length + 7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
@@ -451,7 +461,7 @@ const TravelingAllowanceReport = () => {
                                 <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
                                 </td>
-                              )}
+                              )} */}
                             </tr>
                           );
                         }
@@ -488,9 +498,9 @@ const TravelingAllowanceReport = () => {
                           <td className='border'><strong>B/F</strong></td>
                           <td className='border'><strong>{totalAmount && parseInt(totalAmount)}</strong></td>
                           <td className='border'><strong>{totalAmount && +(totalAmount - Math.floor(totalAmount)).toFixed(2)}</strong></td>
-                          <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed] text-lg`} style={{ writingMode: 'sideways-lr' }}>
+                          {/* <td rowSpan={7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed] text-lg`} style={{ writingMode: 'sideways-lr' }}>
                             <div>Check Tickets in <br/> Running Train</div>
-                          </td>
+                          </td> */}
                         </tr>
                         }
                         {Array.from({ length: 6 }).map((_, i) => {
