@@ -217,7 +217,7 @@ const TravelingAllowanceReport = () => {
                       <th rowSpan={2} className="border p-2">Hrs. Out of H.Q.</th>
                       <th rowSpan={2} className="border p-2">%AGE</th>
                       <th colSpan={2} className="border p-2">Amount</th>
-                      <th rowSpan={2} className="border p-2">Object of journey</th>
+                      {/* <th rowSpan={2} className="border p-2">Object of journey</th> */}
                     </tr>
                     <tr>
                       <th className="border p-2">From</th>
@@ -443,7 +443,7 @@ const TravelingAllowanceReport = () => {
                               <td className="border pli-2 plb-0.5 ">{travel?.percentage}%</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.rs}</td>
                               <td className="border pli-2 plb-0.5 ">{travel?.amount?.p}</td>
-                              {(index === 0 || index === 25 || index === 50) && (
+                              {/* {(index === 0 || index === 25 || index === 50) && (
                                 <td
                                   rowSpan={ROWS_PER_PAGE - (index % ROWS_PER_PAGE)}
                                   className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`}
@@ -451,7 +451,7 @@ const TravelingAllowanceReport = () => {
                                 >
                                   Check Tickets in Running Train
                                 </td>
-                              )}
+                              )} */}
                               {/* {index === 0 && (
                                 <td rowSpan={data.length >= 25 ? 25 + 1 : data.length + 7} className={`repeat-on-each-page rotate-text border pli-2 plb-0.5  [writing-mode:sideways-lr] [text-orientation:mixed]`} style={{ writingMode: 'sideways-lr' }}>
                                   Check Tickets in Running Train
